@@ -1,0 +1,28 @@
+---
+title: "GET /health"
+description: "Verify the gateway is running."
+---
+
+Returns the gateway status. No authentication required.
+
+## Request
+
+```bash
+curl http://localhost:8009/health
+```
+
+## Response
+
+```json
+{
+  "status": "ok",
+  "version": "1.0.0",
+  "registry_count": 3
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string | Always `"ok"` when the server is running |
+| `version` | string | Gateway version |
+| `registry_count` | integer | Number of registered MCP servers |

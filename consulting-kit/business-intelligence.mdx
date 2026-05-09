@@ -1,0 +1,57 @@
+---
+title: "Business Intelligence MCP"
+description: "Natural language to SQL — query any database by describing what you want."
+---
+
+**Port:** 8101  
+**Path:** `showcase-servers/business-intelligence-mcp/`
+
+## What it does
+
+Translates natural language into SQL queries and executes them against your database. Supports PostgreSQL, MySQL, and SQLite.
+
+**Example prompts:**
+
+> *"Show me the top 10 customers by revenue this quarter."*
+
+> *"How many orders were placed in the last 30 days?"*
+
+> *"List all products with inventory below the reorder threshold."*
+
+## Configuration
+
+```bash
+cp showcase-servers/business-intelligence-mcp/.env.example \
+   showcase-servers/business-intelligence-mcp/.env
+```
+
+Key variables:
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Connection string (PostgreSQL, MySQL, or SQLite) |
+| `MAX_ROWS` | Maximum rows returned per query |
+| `ALLOWED_TABLES` | Comma-separated table allowlist (optional) |
+
+**PostgreSQL:**
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/mydb
+```
+
+**SQLite:**
+```bash
+DATABASE_URL=sqlite:///./data/mydb.sqlite
+```
+
+## Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `query_database` | Natural language → SQL → results |
+| `list_tables` | List available tables in the database |
+| `describe_table` | Return schema for a specific table |
+| `execute_sql` | Run a raw SQL query directly |
+
+## Security
+
+Use `ALLOWED_TABLES` to restrict which tables Claude can query. Connect with a read-only database user unless your use case explicitly requires writes.

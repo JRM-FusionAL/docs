@@ -1,0 +1,80 @@
+---
+title: "Christopher Quick Start"
+description: "Install and run the local voice AI pipeline."
+---
+
+## Prerequisites
+
+- WSL2 running Ubuntu (Windows users)
+- NVIDIA GPU recommended — GTX 1050 Ti 4GB minimum for default models
+- CUDA toolkit installed in WSL2
+- `alsa-utils` and `ffmpeg`
+
+## One-command install (recommended)
+
+The pilot installer checks all prerequisites, then builds whisper.cpp and llama.cpp from source and downloads the default models:
+
+```bash
+bash pilot_install.sh
+```
+
+This takes 10–30 minutes depending on your hardware and internet connection.
+
+## Verify the pipeline
+
+```bash
+bash preflight_voice.sh
+```
+
+This checks that all three engines are built and the audio pipeline is ready.
+
+## Run Christopher
+
+```bash
+# Voice mode — speak and hear responses
+python3 christopher.py --voice
+
+# Chat mode — text only, no microphone required
+python3 christopher.py --chat
+```
+
+## WSL2 microphone setup
+
+If voice mode starts but never detects speech:
+
+1. Start PulseAudio on Windows: `C:\PulseAudio\start-pulseaudio.cmd`
+2. In WSL2, set the server address:
+
+```bash
+export PULSE_SERVER=tcp:$(awk '/^nameserver / {print $2; exit}' /etc/resolv.conf):4713
+```
+
+3. Re-run `python3 christopher.py --voice`
+
+Christopher tries PulseAudio capture (`parec`) first and falls back to ALSA (`arecord`) automatically.
+
+## Manual build (if the installer fails)
+
+```bash
+# whisper.cpp
+git clone https://github.com/ggerganov/whisper.cpp
+cd whisper.cpp && mkdir build && cd build
+cmake .. && make -j4
+bash models/download-ggml-model.sh base.en
+cd ../..
+
+# llama.cpp with CUDA
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp && mkdir build && cd build
+cmake .. -DGGML_CUDA=ON && make -j4
+cd ../..
+
+# Piper TTS
+pip install piper-tts
+
+# Christopher dependencies
+pip install -r christopher_requirements.txt
+
+# System packages
+sudo apt install alsa-utils ffmpeg
+```

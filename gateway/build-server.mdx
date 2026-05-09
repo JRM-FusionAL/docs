@@ -1,0 +1,100 @@
+---
+title: "Building MCP Servers"
+description: "Build custom MCP servers manually or let FusionAL generate them."
+---
+
+## AI-powered generation (recommended)
+
+After connecting FusionAL to Claude Desktop, describe the server you want:
+
+> *"Generate an MCP server that queries our PostgreSQL database using natural language."*
+
+FusionAL generates the project, builds it in Docker, and registers it automatically. No manual steps.
+
+---
+
+## Manual server structure
+
+```
+my-server/
+├── Dockerfile
+├── requirements.txt
+├── my_server.py
+└── .env
+```
+
+## Server template
+
+```python
+from mcp.server.fastmcp import FastMCP
+import sys
+
+mcp = FastMCP("my-server")
+
+@mcp.tool()
+async def my_tool(query: str = "") -> str:
+    """What this tool does in one line."""
+    return f"Result for: {query}"
+
+if __name__ == "__main__":
+    mcp.run(transport='stdio')
+```
+
+## Rules for MCP client compatibility
+
+These rules prevent silent failures in Claude Desktop and other MCP clients:
+
+1. Use `@mcp.tool()` decorators on `async` functions.
+2. **Single-line docstrings only** — multi-line docstrings break some MCP clients.
+3. Return formatted strings from all tools.
+4. Default parameters to `""` not `None`.
+5. Log to `sys.stderr`, never `sys.stdout`.
+6. Run as a non-root user in Docker.
+
+## Dockerfile template
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN useradd -m appuser
+USER appuser
+
+CMD ["python", "my_server.py"]
+```
+
+## Register with the gateway
+
+After starting your server, register it:
+
+```bash
+curl -X POST http://localhost:8009/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-server",
+    "url": "http://localhost:8110/mcp",
+    "port": 8110,
+    "description": "What my server does"
+  }'
+```
+
+Verify registration:
+
+```bash
+curl http://localhost:8009/catalog
+```
+
+## Bundled examples
+
+Three example servers ship with FusionAL in the `examples/` directory:
+
+| Example | Path | What it shows |
+|---------|------|---------------|
+| Dice Roller | `examples/dice-roller/` | Multiple tools, dice notation parsing |
+| Weather API | `examples/weather-api/` | External API integration, error handling |
+| File Utils | `examples/file-utils/` | Safe filesystem access, pagination |

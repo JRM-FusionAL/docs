@@ -1,0 +1,68 @@
+---
+title: "Windsurf"
+description: "Connect Windsurf to FusionAL and the MCP consulting kit servers."
+---
+
+## Add FusionAL to Windsurf
+
+In Windsurf settings, open the MCP configuration and add:
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "type": "streamable-http",
+      "url": "http://localhost:8009/mcp"
+    }
+  }
+}
+```
+
+## Add the consulting kit servers
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp"
+    },
+    "api-integration": {
+      "type": "streamable-http",
+      "url": "http://localhost:8102/mcp"
+    },
+    "content-automation": {
+      "type": "streamable-http",
+      "url": "http://localhost:8103/mcp"
+    },
+    "intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8104/mcp"
+    }
+  }
+}
+```
+
+## With API key auth
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp",
+      "headers": {
+        "X-API-Key": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Verify the connection
+
+Open a Windsurf chat session. MCP tools should appear in the tool picker. If they don't:
+
+1. Confirm the server is running: `curl http://localhost:8101/health`
+2. Verify the URL ends with `/mcp` (not `/sse`)
+3. Restart Windsurf after editing the MCP config

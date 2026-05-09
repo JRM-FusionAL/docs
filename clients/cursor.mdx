@@ -1,0 +1,72 @@
+---
+title: "Cursor"
+description: "Connect Cursor to FusionAL and the MCP consulting kit servers."
+---
+
+## Add FusionAL to Cursor
+
+In Cursor, open **Settings → Features → MCP Servers** and add:
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "type": "streamable-http",
+      "url": "http://localhost:8009/mcp"
+    }
+  }
+}
+```
+
+<Note>
+Cursor uses the `/mcp` endpoint (Streamable HTTP), not `/sse`. Claude Desktop uses `/sse`.
+</Note>
+
+## Add the consulting kit servers
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp"
+    },
+    "api-integration": {
+      "type": "streamable-http",
+      "url": "http://localhost:8102/mcp"
+    },
+    "content-automation": {
+      "type": "streamable-http",
+      "url": "http://localhost:8103/mcp"
+    },
+    "intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8104/mcp"
+    }
+  }
+}
+```
+
+## With API key auth
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp",
+      "headers": {
+        "X-API-Key": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## Verify the connection
+
+Open a Cursor chat and check that the MCP tools appear in the tool list. If they don't:
+
+1. Confirm the server is running: `curl http://localhost:8101/health`
+2. Verify the URL ends with `/mcp` (not `/sse`)
+3. Restart Cursor after editing the MCP config

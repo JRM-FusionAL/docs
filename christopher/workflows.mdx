@@ -1,0 +1,69 @@
+---
+title: "Workflow Templates"
+description: "Pre-built voice workflow templates for dispatch, notes, and summaries."
+---
+
+Christopher ships three voice workflow templates in the `workflows/` directory.
+
+## Available templates
+
+| Template | File | Description |
+|----------|------|-------------|
+| Dispatch | `workflows/dispatch.yaml` | Route a spoken message to Slack, GitHub Issues, or a webhook |
+| Note Capture | `workflows/notes.yaml` | Transcribe and tag a spoken note; write to a local file or remote store |
+| Summary Generation | `workflows/summaries.yaml` | Condense notes or a transcript into bullet points, prose, or a TL;DR |
+
+Full schemas, sample conversation turns, and domain adaptation guidance: `docs/workflow-templates.md`
+
+## Dispatch template
+
+Speak a command and Christopher routes it to the right integration:
+
+> *"Send to Slack: the deploy is live."*
+
+> *"Open a GitHub issue: investigate the login timeout bug."*
+
+> *"Webhook alert: database CPU above 90%."*
+
+Configure integrations in `workflows/dispatch.yaml`:
+
+```yaml
+integrations:
+  slack:
+    channel: "#engineering"
+    token_env: SLACK_BOT_TOKEN
+  github:
+    repo: "owner/repo"
+    token_env: GITHUB_TOKEN
+  webhook:
+    url: "https://your.webhook.url/endpoint"
+```
+
+## Note Capture template
+
+Speak a note — Christopher transcribes it, tags it, and saves it:
+
+> *"Note: follow up with the client about the API timeline."*
+
+Configure the output in `workflows/notes.yaml`:
+
+```yaml
+output:
+  type: file       # or "notion" or "remote"
+  path: ~/notes/christopher-notes.md
+  format: markdown
+```
+
+## Summary Generation template
+
+Give Christopher a transcript or notes file and ask for a summary:
+
+> *"Summarize my notes from today as bullet points."*
+
+Configure the output format in `workflows/summaries.yaml`:
+
+```yaml
+summary:
+  style: bullets   # or "prose" or "tldr"
+  max_length: 300
+```

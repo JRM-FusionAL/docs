@@ -1,0 +1,75 @@
+---
+title: "Installation"
+description: "Install and run the FusionAL gateway locally."
+---
+
+## Requirements
+
+| Requirement | Version |
+|-------------|----------|
+| Python | 3.11+ |
+| Docker Desktop | Any current version |
+| Git | Any |
+
+## Clone the repo
+
+```bash
+git clone https://github.com/JRM-FusionAL/FusionAL.git
+cd FusionAL
+```
+
+## Set up the virtual environment
+
+<CodeGroup>
+
+```bash macOS / Linux
+python -m venv venv
+source venv/bin/activate
+pip install -r core/requirements.txt
+```
+
+```cmd Windows
+python -m venv venv
+venv\Scripts\activate
+pip install -r core/requirements.txt
+```
+
+</CodeGroup>
+
+## Start the gateway
+
+```bash
+cd core
+python -m uvicorn main:app --reload --port 8009
+```
+
+The gateway starts on `http://localhost:8009`.
+
+## Verify
+
+```bash
+curl http://localhost:8009/health
+```
+
+Expected response: `{"status": "ok"}` with a `200 OK` status.
+
+## Environment variables
+
+Copy `.env.example` to `.env` in the project root and configure:
+
+```bash
+cp .env.example .env
+```
+
+Key variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ANTHROPIC_API_KEY` | Claude API key for server generation | Required for generation |
+| `GATEWAY_PORT` | Port to run the gateway on | `8009` |
+| `SANDBOX_MEMORY_MB` | Docker sandbox memory cap | `128` |
+| `REGISTRY_PATH` | Path to the server registry JSON | `registry.json` |
+
+<Note>
+The gateway needs `ANTHROPIC_API_KEY` only for the `generate_and_execute` and `generate_mcp_project` tools. Health checks and catalog browsing work without it.
+</Note>

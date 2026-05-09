@@ -1,0 +1,113 @@
+---
+title: "Claude Desktop"
+description: "Connect Claude Desktop to FusionAL and the MCP consulting kit servers."
+---
+
+## Config file location
+
+| Platform | Path |
+|----------|------|
+| Windows | `C:\Users\YourName\AppData\Roaming\Claude\claude_desktop_config.json` |
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+
+<Warning>
+**Windows:** Do not use `%APPDATA%` in the path — Claude Desktop does not expand environment variables. Use the full hardcoded path with forward slashes or double backslashes.
+</Warning>
+
+## FusionAL gateway only
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "url": "http://localhost:8009/sse"
+    }
+  }
+}
+```
+
+## Full consulting kit (local)
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp"
+    },
+    "api-integration": {
+      "type": "streamable-http",
+      "url": "http://localhost:8102/mcp"
+    },
+    "content-automation": {
+      "type": "streamable-http",
+      "url": "http://localhost:8103/mcp"
+    },
+    "intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8104/mcp"
+    }
+  }
+}
+```
+
+## Consulting kit via Nginx proxy
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://your-server:8088/bi/"
+    },
+    "api-integration": {
+      "type": "streamable-http",
+      "url": "http://your-server:8088/api/"
+    },
+    "content-automation": {
+      "type": "streamable-http",
+      "url": "http://your-server:8088/content/"
+    },
+    "intelligence": {
+      "type": "streamable-http",
+      "url": "http://your-server:8088/intel/"
+    }
+  }
+}
+```
+
+## With API key auth
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp",
+      "headers": {
+        "X-API-Key": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+## After editing the config
+
+Fully quit Claude Desktop — don't just close the window.
+
+- **Windows:** Right-click the Claude tray icon and select **Quit**, or end the process in Task Manager.
+- **macOS:** Claude → **Quit Claude**.
+
+Then reopen Claude Desktop.
+
+## Windows config hardening script
+
+The mcp-consulting-kit ships a script that backs up your config, rewrites it without BOM, and validates the JSON schema:
+
+```powershell
+./scripts/harden-claude-mcp-config.ps1
+```
+
+See [Windows Setup](/gateway/windows) for full details on Claude Desktop config failure modes.

@@ -1,0 +1,53 @@
+---
+title: "Model Profiles"
+description: "Switch LLM models and tune GPU settings for your hardware."
+---
+
+## Available profiles
+
+| Profile | Model | VRAM | Notes |
+|---------|-------|------|-------|
+| `llama32-3b` | Llama 3.2 3B Q4_K_M | 4GB | Default — best fit for GTX 1050 Ti |
+| `qwen25-3b` | Qwen2.5 3B | 4GB | Better reasoning at the same VRAM |
+| `mistral-7b` | Mistral 7B | 4GB+ | Slower on 4GB — use with reduced context |
+
+## Set a default profile
+
+In `.env`:
+
+```bash
+MODEL_PROFILE=llama32-3b
+```
+
+## Switch profile per run
+
+```bash
+python3 christopher.py --chat --model-profile qwen25-3b
+python3 christopher.py --voice --model-profile llama32-3b
+python3 christopher.py --chat --model-profile mistral-7b --ngl 28 --ctx 512
+```
+
+## GPU layer tuning
+
+| VRAM | Recommended flags |
+|------|-------------------|
+| 4GB (GTX 1050 Ti) | Default profile settings |
+| 4GB with Mistral 7B | `--ngl 28 --ctx 512` |
+| 8GB | `--ngl 40 --ctx 2048` |
+| 16GB+ | `--ngl 99 --ctx 4096` |
+
+`--ngl` controls the number of layers offloaded to the GPU. Higher = more VRAM used, faster inference.
+
+`--ctx` sets the context window size. Larger = more memory, longer conversation history.
+
+## Benchmark mode
+
+Compare model latency on your hardware before committing to a profile:
+
+```bash
+python3 christopher.py --benchmark --model-profile llama32-3b
+python3 christopher.py --benchmark --model-profile qwen25-3b
+python3 christopher.py --benchmark --model-profile mistral-7b --ngl 28 --ctx 512
+```
+
+Each run prints per-request latency and the average so you can compare profiles side by side on your actual hardware.

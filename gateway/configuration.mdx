@@ -1,0 +1,86 @@
+---
+title: "Configuration"
+description: "Configure the FusionAL gateway, client access, and the server registry."
+---
+
+## Claude Desktop config
+
+Add FusionAL to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "url": "http://localhost:8009/sse"
+    }
+  }
+}
+```
+
+Config file locations:
+
+| Platform | Path |
+|----------|------|
+| Windows | `C:\Users\YourName\AppData\Roaming\Claude\claude_desktop_config.json` |
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+
+## Docker gateway URL
+
+If running via Docker Compose (default port 8089):
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "url": "http://localhost:8089/sse"
+    }
+  }
+}
+```
+
+## Server registry
+
+FusionAL keeps a registry of connected MCP servers in `registry.json`. Register a server via the API:
+
+```bash
+curl -X POST http://localhost:8009/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "business-intelligence-mcp",
+    "url": "http://localhost:8101/mcp",
+    "port": 8101,
+    "description": "Natural language to SQL"
+  }'
+```
+
+Or edit `registry.json` directly:
+
+```json
+{
+  "servers": [
+    {
+      "name": "business-intelligence-mcp",
+      "url": "http://localhost:8101/mcp",
+      "port": 8101,
+      "description": "Natural language to SQL"
+    }
+  ]
+}
+```
+
+## API key auth (optional)
+
+When `showcase-servers/common/security.py` is present, the gateway enables API key authentication on `/execute`, `/register`, and `/generate`.
+
+Set your key in `.env`:
+
+```bash
+MCP_API_KEY=your-secret-key-here
+```
+
+Pass it in requests:
+
+```bash
+curl -H "X-API-Key: your-secret-key-here" http://localhost:8009/catalog
+```

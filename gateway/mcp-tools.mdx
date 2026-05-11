@@ -1,0 +1,78 @@
+---
+title: "MCP Tools"
+description: "The three built-in tools FusionAL exposes to connected AI clients."
+---
+
+FusionAL exposes three MCP tools to any connected client. These let Claude generate, run, and register code without leaving the conversation.
+
+## execute_code
+
+Run Python in an isolated Docker sandbox.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `code` | string | Python code to execute |
+| `timeout` | integer | Execution timeout in seconds (default: 30) |
+
+**Example prompt:**
+
+> *"Execute this Python snippet: `import platform; print(platform.node())`"*
+
+**Sandbox limits:**
+
+| Limit | Default |
+|-------|---------|
+| Memory | 128 MB (configurable via `SANDBOX_MEMORY_MB`) |
+| Processes | 64 max |
+| Network | Isolated (no outbound) |
+| Filesystem | Read-only except `/tmp` |
+| User | Non-root |
+
+---
+
+## generate_and_execute
+
+Describe what you want in plain English. Claude writes the Python — FusionAL runs it in the sandbox.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `prompt` | string | What you want the code to do |
+
+**Example prompt:**
+
+> *"Fetch the top 5 trending GitHub repos today and return their names and star counts."*
+
+FusionAL passes the prompt to Claude, runs the generated code in the sandbox, and returns the output — all in one tool call.
+
+---
+
+## generate_mcp_project
+
+Describe an MCP server in plain English. Claude builds the full project. FusionAL registers and runs it.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `description` | string | What the MCP server should do |
+| `name` | string | Server name (used for Docker image tag and registry entry) |
+
+**Example prompt:**
+
+> *"Generate an MCP server that queries our PostgreSQL database using natural language."*
+
+FusionAL:
+1. Passes the description to Claude
+2. Generates a full MCP server project (Dockerfile, requirements.txt, server.py)
+3. Builds and runs the Docker container
+4. Registers the server in the gateway catalog
+
+The new server is immediately available to all connected clients.
+
+<Note>
+This tool requires `ANTHROPIC_API_KEY` to be set in your `.env` file.
+</Note>

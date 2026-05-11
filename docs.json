@@ -1,68 +1,116 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "FusionAL Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "FusionAL Gateway",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "quickstart"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Setup",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "gateway/installation",
+              "gateway/configuration",
+              "gateway/docker",
+              "gateway/windows"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Usage",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "gateway/mcp-tools",
+              "gateway/build-server",
+              "gateway/architecture"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "MCP Consulting Kit",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
-              "api-reference/introduction"
+              "consulting-kit/overview",
+              "consulting-kit/quick-start"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Servers",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "consulting-kit/business-intelligence",
+              "consulting-kit/api-integration",
+              "consulting-kit/content-automation",
+              "consulting-kit/intelligence"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "consulting-kit/security",
+              "consulting-kit/deployment"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Christopher AI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "christopher/overview",
+              "christopher/quick-start"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "christopher/model-profiles",
+              "christopher/workflows"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Connect AI Clients",
+        "groups": [
+          {
+            "group": "Setup Guides",
+            "pages": [
+              "clients/claude-desktop",
+              "clients/cursor",
+              "clients/windsurf"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "REST API",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/endpoint/health",
+              "api-reference/endpoint/execute",
+              "api-reference/endpoint/generate",
+              "api-reference/endpoint/register",
+              "api-reference/endpoint/catalog"
             ]
           }
         ]
@@ -71,14 +119,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "GitHub",
+          "href": "https://github.com/JRM-FusionAL",
+          "icon": "github"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Book a Call",
+          "href": "https://calendly.com/jonathanmelton004/30min",
+          "icon": "calendar"
         }
       ]
     }
@@ -90,33 +138,19 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "fusional.dev",
+        "href": "https://fusional.dev"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Book a Call",
+      "href": "https://calendly.com/jonathanmelton004/30min"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/JRM-FusionAL"
     }
   }
 }

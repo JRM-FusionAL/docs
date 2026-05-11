@@ -1,0 +1,84 @@
+---
+title: "Security"
+description: "API key auth, rate limiting, and hardening for production deployments."
+---
+
+## API key authentication
+
+All servers share a common security module at `showcase-servers/common/security.py`. When present, it enables:
+
+- API key validation on all endpoints via the `X-API-Key` header
+- Rate limiting (configurable per server)
+- CORS configuration
+
+Set your API key in each server's `.env`:
+
+```bash
+MCP_API_KEY=your-strong-secret-here
+```
+
+Pass it in requests:
+
+```bash
+curl -H "X-API-Key: your-strong-secret-here" http://localhost:8101/health
+```
+
+## MCP client config with auth
+
+When API key auth is enabled, include the key in your Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp",
+      "headers": {
+        "X-API-Key": "your-strong-secret-here"
+      }
+    }
+  }
+}
+```
+
+## Rate limiting
+
+Configure per-server rate limits in each server's `.env`:
+
+```bash
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW_SECONDS=60
+```
+
+## Nginx proxy
+
+The kit ships an Nginx config (`nginx.conf`) that provides single-port access (8088) to all servers via path routing:
+
+| Path | Server |
+|------|--------|
+| `/bi/` | Business Intelligence (8101) |
+| `/api/` | API Integration Hub (8102) |
+| `/content/` | Content Automation (8103) |
+| `/intel/` | Intelligence MCP (8104) |
+
+Start with:
+
+```bash
+docker compose -f nginx-compose.yaml up -d
+```
+
+Verify:
+
+```bash
+curl -u 'mcpadmin:your-password' http://localhost:8088/healthz
+```
+
+## API key rotation
+
+Use the overlap-and-revoke flow from `showcase-servers/common/SECURITY-HARDENING.md`:
+
+1. Generate a new API key.
+2. Add both old and new keys to the allowed list.
+3. Update all clients to use the new key.
+4. Confirm all clients are using the new key.
+5. Remove the old key.

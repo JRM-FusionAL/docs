@@ -1,0 +1,85 @@
+---
+title: "Deployment"
+description: "Deploy the MCP consulting kit to a remote server and access it securely."
+---
+
+## Sync to a remote server
+
+Sync all repos from your local `Projects` folder to a remote server:
+
+<CodeGroup>
+
+```powershell Windows
+# Sync only
+./scripts/sync-all.ps1 -RemoteAlias t3610 -RemoteBase /home/jrm_fusional/Projects
+
+# Sync + restart Docker services
+./scripts/sync-all.ps1 -RestartDocker
+```
+
+```bash Linux / macOS
+# Sync only
+./scripts/sync-all.sh --remote t3610 --remote-base /home/jrm_fusional/Projects
+
+# Sync + restart Docker services
+./scripts/sync-all.sh --restart-docker
+```
+
+</CodeGroup>
+
+## Cloudflare Tunnel
+
+The kit includes a Cloudflare Tunnel setup guide at `docs/CLOUDFLARE-TUNNEL-SETUP.md`. This gives you a public HTTPS URL for each server without opening firewall ports.
+
+## SSH tunnel (Windows Claude Desktop)
+
+If Cloudflare blocks Node-based MCP clients, run Claude through a local SSH tunnel:
+
+```powershell
+./scripts/start-claude-mcp-tunnel.ps1 -RemoteAlias t3610
+```
+
+This script opens tunnel ports `18009`, `18101–18104` locally, rewrites the Claude Desktop MCP config to use those ports, verifies health, and launches Claude Desktop.
+
+## One-command ready sequence
+
+```powershell
+# Local servers
+./scripts/start-claude-ready.ps1
+
+# Remote via SSH tunnel
+./scripts/start-claude-ready.ps1 -UseTunnel -RemoteAlias t3610
+
+# Harden + tunnel only, skip Claude launch
+./scripts/start-claude-ready.ps1 -UseTunnel -SkipLaunchClaude
+
+# Non-interactive (for CI)
+./scripts/start-claude-ready.ps1 -UseTunnel -SkipLaunchClaude -NonInteractive
+```
+
+## Status check
+
+```powershell
+./scripts/status-all.ps1 -RemoteAlias t3610
+```
+
+```bash
+./scripts/status-all.sh --remote t3610
+```
+
+## Production frontend
+
+A Vite + React frontend lives in `frontend/`:
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+Run in Docker:
+
+```bash
+docker build -t mcp-kit-frontend ./frontend
+docker run -p 3000:80 --rm mcp-kit-frontend
+```

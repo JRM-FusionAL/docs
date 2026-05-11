@@ -1,0 +1,129 @@
+---
+title: "Windows Setup"
+description: "Six Windows MCP failure modes — and how FusionAL solves them."
+---
+
+Official MCP documentation doesn't cover Windows edge cases. FusionAL has documented and solved all six common failure modes.
+
+## Failure mode 1: The 60-second silence
+
+**Symptom:** Claude Desktop times out silently after 60 seconds with no error message.
+
+**Cause:** Docker socket initialization lag on Windows. The MCP server takes longer than Claude's connection timeout to respond.
+
+**Fix:** Start Docker Desktop and wait for it to fully initialize before launching Claude Desktop.
+
+```bash
+docker info
+```
+
+If this command returns an error, Docker isn't ready. Wait for it before opening Claude.
+
+[Full write-up →](https://dev.to/jonathanmeltonfusional/why-your-mcp-setup-keeps-timing-out-in-60-seconds-and-how-i-fixed-it-on-windows-367a)
+
+---
+
+## Failure mode 2: The BOM trap
+
+**Symptom:** Claude Desktop fails silently after editing `claude_desktop_config.json`.
+
+**Cause:** Notepad and some VS Code configurations inject a byte-order mark (BOM) into UTF-8 files. JSON parsers reject BOM-prefixed files silently.
+
+**Fix:** Write the config without BOM using PowerShell:
+
+```powershell
+$content = Get-Content "claude_desktop_config.json" -Raw
+[System.IO.File]::WriteAllText(
+  "claude_desktop_config.json",
+  $content,
+  (New-Object System.Text.UTF8Encoding($false))
+)
+```
+
+The `$false` argument disables the BOM.
+
+---
+
+## Failure mode 3: The backslash trap
+
+**Symptom:** Paths in `claude_desktop_config.json` look correct but Claude Desktop can't find the files.
+
+**Cause:** Single Windows backslashes in JSON paths break Claude Desktop's parser silently.
+
+**Fix:** Use forward slashes or double-escaped backslashes:
+
+```json
+// Works
+"command": "C:/Users/YourName/venv/Scripts/python.exe"
+
+// Also works
+"command": "C:\\Users\\YourName\\venv\\Scripts\\python.exe"
+
+// Breaks silently
+"command": "C:\Users\YourName\venv\Scripts\python.exe"
+```
+
+---
+
+## Failure mode 4: Environment variable expansion
+
+**Symptom:** Paths using `%APPDATA%`, `%USERPROFILE%`, or `%LOCALAPPDATA%` don't resolve.
+
+**Cause:** Claude Desktop does not expand Windows environment variables in config paths.
+
+**Fix:** Hardcode the full path:
+
+```json
+// Wrong — Claude Desktop will not expand %APPDATA%
+"command": "%APPDATA%\\Python\\python.exe"
+
+// Correct — hardcoded full path
+"command": "C:\\Users\\YourName\\AppData\\Roaming\\Python\\python.exe"
+```
+
+---
+
+## Failure mode 5: Docker named pipe failure
+
+**Symptom:** Docker-based MCP servers fail to connect on WSL2.
+
+**Cause:** Docker's named pipe transport (`//./pipe/docker_engine`) fails on WSL2.
+
+**Fix:** Use the Unix socket instead:
+
+```bash
+export DOCKER_HOST=unix:///var/run/docker.sock
+```
+
+If `/var/run/docker.sock` doesn't exist, enable Docker Desktop's WSL2 integration in **Settings → Resources → WSL Integration**.
+
+---
+
+## Failure mode 6: Registry timeout at 8+ servers
+
+**Symptom:** Claude Desktop hangs or times out at startup with many MCP servers registered.
+
+**Cause:** Claude Desktop hits a connection timeout threshold when initializing more than ~8 MCP servers, especially on older hardware (i5/i7 7th gen and below).
+
+**Fix:** Keep your active server registry at 8 or fewer entries on lower-end hardware.
+
+```bash
+# Check your current registered server count
+curl http://localhost:8009/catalog
+```
+
+Remove unused servers from `registry.json` or deregister them via the API.
+
+---
+
+## Config hardening script
+
+The mcp-consulting-kit ships a PowerShell script that automates all config hardening:
+
+```powershell
+# Backup + no-BOM write + schema validation
+./scripts/harden-claude-mcp-config.ps1
+
+# For SSH tunnel ports instead of local ports
+./scripts/harden-claude-mcp-config.ps1 -UseTunnelPorts
+```

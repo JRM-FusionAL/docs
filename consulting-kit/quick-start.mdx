@@ -1,0 +1,97 @@
+---
+title: "Quick Start"
+description: "Deploy all four MCP servers in under 15 minutes."
+---
+
+## Step 1: Clone
+
+```bash
+git clone https://github.com/JRM-FusionAL/mcp-consulting-kit.git
+cd mcp-consulting-kit
+```
+
+## Step 2: Install dependencies
+
+```bash
+pip3 install fastapi "uvicorn[standard]" python-dotenv pydantic requests \
+             beautifulsoup4 feedparser lxml sqlalchemy "mcp[cli]"
+```
+
+## Step 3: Configure
+
+Copy `.env.example` to `.env` in each server directory and fill in your credentials:
+
+```bash
+cp showcase-servers/business-intelligence-mcp/.env.example \
+   showcase-servers/business-intelligence-mcp/.env
+
+cp showcase-servers/api-integration-hub/.env.example \
+   showcase-servers/api-integration-hub/.env
+
+cp showcase-servers/content-automation-mcp/.env.example \
+   showcase-servers/content-automation-mcp/.env
+```
+
+## Step 4: Launch
+
+<CodeGroup>
+
+```bash Linux / macOS
+chmod +x launch.sh
+./launch.sh
+```
+
+```cmd Windows
+launch-all-servers.bat
+```
+
+```bash Python (any platform)
+python3 launch.py
+```
+
+</CodeGroup>
+
+## Step 5: Verify
+
+```bash
+curl http://localhost:8101/health
+curl http://localhost:8102/health
+curl http://localhost:8103/health
+curl http://localhost:8104/health
+curl http://localhost:8009/health
+```
+
+All should return `200 OK`.
+
+## Step 6: Connect to Claude Desktop
+
+Add to `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "business-intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8101/mcp"
+    },
+    "api-integration": {
+      "type": "streamable-http",
+      "url": "http://localhost:8102/mcp"
+    },
+    "content-automation": {
+      "type": "streamable-http",
+      "url": "http://localhost:8103/mcp"
+    },
+    "intelligence": {
+      "type": "streamable-http",
+      "url": "http://localhost:8104/mcp"
+    }
+  }
+}
+```
+
+Fully quit and reopen Claude Desktop. All four servers will be available as tools.
+
+<Tip>
+If you're on Windows and having trouble, run `./scripts/harden-claude-mcp-config.ps1` to validate and fix your config file automatically.
+</Tip>

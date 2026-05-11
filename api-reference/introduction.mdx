@@ -1,33 +1,40 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "REST API"
+description: "FusionAL gateway REST API reference."
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+The FusionAL gateway exposes a REST API alongside the MCP transport. Use it to execute code, manage the server registry, and trigger server generation programmatically.
 
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+**Base URL (local):** `http://localhost:8009`  
+**Base URL (Docker):** `http://localhost:8089`
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+When API key auth is enabled, pass your key in every request:
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```bash
+curl -H "X-API-Key: your-api-key" http://localhost:8009/catalog
 ```
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/health`](/api-reference/endpoint/health) | GET | Health check |
+| [`/execute`](/api-reference/endpoint/execute) | POST | Execute Python in a sandbox |
+| [`/generate`](/api-reference/endpoint/generate) | POST | Generate and launch an MCP server from a prompt |
+| [`/register`](/api-reference/endpoint/register) | POST | Register an MCP server in the registry |
+| [`/catalog`](/api-reference/endpoint/catalog) | GET | List all registered servers |
+
+## Content type
+
+All POST endpoints expect `Content-Type: application/json`.
+
+## Error codes
+
+| Code | Meaning |
+|------|---------|
+| 400 | Bad request — malformed JSON or missing required fields |
+| 401 | Unauthorized — missing or invalid API key |
+| 422 | Unprocessable entity — valid JSON but failed validation |
+| 500 | Internal server error — sandbox failure or generation error |

@@ -1,97 +1,86 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "FusionAL Documentation"
+description: "Self-hosted MCP governance for teams that have already said yes to MCP."
 ---
 
-## Setting up
+## What is FusionAL?
 
-Get your documentation site up and running in minutes.
+FusionAL is a **self-hosted MCP governance gateway** that sits between your AI clients and your tool servers. One endpoint. Central auth. Tool-level policy enforcement. Full audit trail. Deployable in a single Docker command.
+
+**The problem:** Every MCP server you connect loads its full tool manifest into Claude's context window before processing a single token. At 84 tools across several servers, that's 15,540 tokens consumed at session start — before your team has asked anything. At scale, that's cost, latency, and an audit surface nobody can explain to legal.
+
+## The FusionAL ecosystem
+
+<Columns cols={2}>
+  <Card
+    title="FusionAL Gateway"
+    icon="shield"
+    href="/quickstart"
+  >
+    The governance gateway. One SSE endpoint, central auth, tool-level policy enforcement, full audit trail. Start here.
+  </Card>
+  <Card
+    title="MCP Consulting Kit"
+    icon="server"
+    href="/consulting-kit/overview"
+  >
+    Four production-grade MCP servers: Business Intelligence, API Integration, Content Automation, and Intelligence.
+  </Card>
+  <Card
+    title="Christopher AI"
+    icon="microphone"
+    href="/christopher/overview"
+  >
+    Fully local voice AI. No cloud. No API keys. Built on whisper.cpp, llama.cpp, and Piper TTS.
+  </Card>
+  <Card
+    title="Connect AI Clients"
+    icon="plug"
+    href="/clients/claude-desktop"
+  >
+    Connect Claude Desktop, Cursor, Windsurf, and other MCP clients to your FusionAL gateway.
+  </Card>
+</Columns>
+
+## Why teams choose FusionAL
+
+<AccordionGroup>
+  <Accordion title="Token control" icon="gauge">
+    Filter which tools each client sees. Stop context bloat from scaling with your server count.
+  </Accordion>
+  <Accordion title="Audit-ready operations" icon="file-lines">
+    Every tool call logged with caller, input, latency, and response status.
+  </Accordion>
+  <Accordion title="Policy enforcement" icon="lock">
+    Control what tools run, for whom, and under what conditions.
+  </Accordion>
+  <Accordion title="Windows-hardened" icon="windows">
+    Six documented failure modes solved. None of them appear in official MCP docs.
+  </Accordion>
+  <Accordion title="AI-powered server generation" icon="wand-magic-sparkles">
+    Describe a tool in plain English — FusionAL generates, registers, and runs it automatically.
+  </Accordion>
+</AccordionGroup>
+
+## Start in 5 minutes
 
 <Card
-  title="Start here"
+  title="Quickstart — FusionAL Gateway"
   icon="rocket"
   href="/quickstart"
   horizontal
 >
-  Follow our three step quickstart guide.
+  Clone, start the gateway, and connect Claude Desktop. Five minutes.
 </Card>
 
-## Make it yours
+## Consulting
 
-Design a docs site that looks great and empowers your users.
+Don't want to self-manage? FusionAL offers done-for-you MCP deployments.
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+| Package | Price | What you get |
+|---------|-------|--------------|
+| Starter Pilot | $3,500 | Prove value with 1 workflow in 2 weeks |
+| Growth Pilot | $9,000 | Multi-workflow rollout with observability dashboard |
+| Managed Ops | $3k/mo | Ongoing governance + support + quarterly expansion |
 
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+[Book a free 15-min MCP security audit →](https://calendly.com/jonathanmelton004/30min)

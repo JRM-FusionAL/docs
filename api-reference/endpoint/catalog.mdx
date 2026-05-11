@@ -1,0 +1,48 @@
+---
+title: "GET /catalog"
+description: "List all registered MCP servers in the gateway."
+---
+
+Returns all servers currently registered in the gateway registry.
+
+## Request
+
+```bash
+curl http://localhost:8009/catalog
+```
+
+## Response
+
+```json
+{
+  "servers": [
+    {
+      "name": "business-intelligence-mcp",
+      "url": "http://localhost:8101/mcp",
+      "port": 8101,
+      "description": "Natural language to SQL (PostgreSQL, MySQL, SQLite)"
+    },
+    {
+      "name": "api-integration-hub",
+      "url": "http://localhost:8102/mcp",
+      "port": 8102,
+      "description": "Slack, GitHub Issues, Stripe"
+    }
+  ],
+  "count": 2
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `servers` | array | List of registered server objects |
+| `count` | integer | Total number of registered servers |
+
+Each server object:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Server identifier |
+| `url` | string | MCP endpoint URL |
+| `port` | integer | Server port |
+| `description` | string | Server description |

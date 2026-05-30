@@ -1,0 +1,87 @@
+---
+title: "Start / Stop"
+description: "Control FusionAL services via the Management API"
+---
+
+## Overview
+
+The Management API provides start and stop commands for all FusionAL services. It runs on T3610 and is only accessible via Tailscale (`http://100.65.9.40:8099`).
+
+## POST /start/:service
+
+Start a stopped service.
+
+### Request
+
+```bash
+curl -X POST http://100.65.9.40:8099/start/bi-mcp
+```
+
+### Path parameters
+
+| Parameter | Description |
+|---|---|
+| `service` | Service key (see table below) |
+
+### Service keys
+
+| Key | Service |
+|---|---|
+| `gateway` | FusionAL Gateway |
+| `bi-mcp` | Business Intelligence MCP |
+| `api-hub` | API Integration Hub |
+| `content-mcp` | Content Automation MCP |
+| `intel-mcp` | Intelligence MCP |
+| `christopher-ai` | Christopher-AI (llama.cpp) |
+
+### Response
+
+```json
+{
+  "action": "start",
+  "service": "bi-mcp",
+  "status": "dispatched"
+}
+```
+
+<Note>
+  `"dispatched"` means the start command was sent — not that the service is fully up. Poll `https://bi.fusional.dev/health` to confirm the service is healthy.
+</Note>
+
+---
+
+## POST /stop/:service
+
+Stop a running service.
+
+### Request
+
+```bash
+curl -X POST http://100.65.9.40:8099/stop/bi-mcp
+```
+
+### Response
+
+```json
+{
+  "action": "stop",
+  "service": "bi-mcp",
+  "status": "dispatched"
+}
+```
+
+---
+
+## Error responses
+
+| Code | Cause |
+|---|---|
+| `400` | Unknown service key |
+| `500` | docker-compose command failed on the host |
+| `504` | Command timed out (8 second timeout) |
+
+---
+
+## Access requirement
+
+The Management API is bound to `100.65.9.40` (Tailscale). Requests from devices not on the Tailscale network will time out with no response. This is intentional — service control is not a public operation.

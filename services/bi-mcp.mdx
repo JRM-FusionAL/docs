@@ -1,0 +1,57 @@
+---
+title: "Business Intelligence MCP"
+description: "Data analytics and business intelligence tools for Claude"
+---
+
+## Overview
+
+The Business Intelligence MCP gives Claude structured access to analytics data, metrics queries, and reporting tools. It's designed for use cases where Claude needs to pull live business data, run aggregations, or generate reports without sending raw data through the cloud API.
+
+**Endpoint:** `https://bi.fusional.dev`
+**Port:** 8101
+**Health:** `https://bi.fusional.dev/health`
+**Tool prefix:** `bi_*`
+
+## Tools
+
+The BI MCP exposes tools for querying data sources, running aggregations, and formatting output for Claude to reason over:
+
+- **`bi_query`** — Execute a structured query against a connected data source
+- **`bi_summarize`** — Summarize a dataset or query result into natural language
+- **`bi_metrics`** — Pull named business metrics (revenue, DAU, conversion, etc.)
+- **`bi_report`** — Generate a formatted report from raw data
+
+<Note>
+  Available tools depend on your connected data sources and configured integrations. Check the gateway's tool listing for the current active set.
+</Note>
+
+## Health check
+
+```bash
+curl https://bi.fusional.dev/health
+```
+
+```json
+{ "status": "ok", "service": "bi-mcp", "uptime": 18402 }
+```
+
+## Use cases
+
+- Ask Claude to pull last week's revenue and compare it to the prior week
+- Have Claude generate a summary report from a database query result
+- Let Claude access live KPIs without copying data into the conversation manually
+
+## Configuration
+
+The BI MCP connects to data sources via environment variables set at container start. See the self-hosting guide for details on configuring database connections.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Gateway" icon="server" href="/services/gateway">
+    The gateway routes `bi_*` tool calls to this server.
+  </Card>
+  <Card title="API Integration Hub" icon="plug" href="/services/api-hub">
+    For pulling data from external APIs rather than internal databases.
+  </Card>
+</Columns>

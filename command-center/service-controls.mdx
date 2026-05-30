@@ -1,0 +1,75 @@
+---
+title: "Service Controls"
+description: "Start and stop MCP services from the Command Center dashboard"
+---
+
+## How it works
+
+Each service card in the Command Center shows **Start** or **Stop** buttons when the service status is known. Clicking either button:
+
+1. Sends a `POST` request to the Management API (`http://100.65.9.40:8099`)
+2. Sets the button to a disabled "Starting…" or "Stopping…" state
+3. Triggers an immediate health re-poll after the action completes
+4. Updates the service card status based on the new poll result
+
+## Management API endpoint
+
+```
+POST http://100.65.9.40:8099/start/<service-key>
+POST http://100.65.9.40:8099/stop/<service-key>
+```
+
+Service keys map to docker-compose service names:
+
+| Key | Service |
+|---|---|
+| `gateway` | FusionAL Gateway |
+| `bi-mcp` | Business Intelligence MCP |
+| `api-hub` | API Integration Hub |
+| `content-mcp` | Content Automation MCP |
+| `intel-mcp` | Intelligence MCP |
+| `christopher-ai` | Christopher-AI (llama.cpp) |
+
+## Tailscale requirement
+
+The Management API binds to the Tailscale interface (`100.65.9.40`) and is not publicly exposed. Start/stop controls will silently fail if your device is not on the Tailscale network.
+
+The Management API endpoint is configurable in the Command Center header — you can override it with a different IP if your Tailscale address changes.
+
+## Error handling
+
+If the Management API call fails (timeout, network error, non-2xx), the Command Center:
+
+- Clears the in-flight state (re-enables buttons)
+- Immediately re-polls health to surface the actual service status
+- Logs the event to the Event Log feed
+
+No explicit error toast is shown — the health re-poll is the source of truth.
+
+## Starting Christopher-AI
+
+Christopher-AI runs as a bare llama.cpp process, not a Docker container. The Management API start command for `christopher-ai` executes a shell command to spawn the process, not `docker-compose start`. See [Christopher-AI Configuration](/christopher-ai/configuration) for the exact startup command.
+
+## Manual control via SSH
+
+If the Command Center is unavailable, you can control services directly on T3610:
+
+```bash
+ssh t3610 "docker-compose -f ~/Projects/mcp-consulting-kit/compose.yaml start bi-mcp"
+ssh t3610 "docker-compose -f ~/Projects/mcp-consulting-kit/compose.yaml stop bi-mcp"
+```
+
+<Note>
+  T3610 uses docker-compose v1 (`docker-compose` with a hyphen). If you see a "command not found" error with `docker compose` (no hyphen), switch to the hyphenated form.
+</Note>
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Management API" icon="terminal" href="/infrastructure/management-api">
+    Full API reference for the start/stop endpoints.
+  </Card>
+  <Card title="Command Center Overview" icon="gauge" href="/command-center/overview">
+    Full dashboard feature reference.
+  </Card>
+</Columns>

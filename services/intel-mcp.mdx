@@ -1,0 +1,53 @@
+---
+title: "Intelligence MCP"
+description: "Research, summarization, and cross-source intelligence gathering tools"
+---
+
+## Overview
+
+The Intelligence MCP provides Claude with tools for research workflows — web search, content extraction, cross-source summarization, and structured intelligence gathering. It's the "research assistant" layer of the FusionAL stack.
+
+**Endpoint:** `https://intel.fusional.dev`
+**Port:** 8104
+**Health:** `https://intel.fusional.dev/health`
+**Tool prefix:** `intel_*`
+
+## Tools
+
+- **`intel_search`** — Run a web search and return structured results
+- **`intel_extract`** — Extract and clean the main content from a URL
+- **`intel_summarize`** — Summarize a body of text or a list of URLs into a concise brief
+- **`intel_compare`** — Compare two or more sources on a topic and surface differences
+- **`intel_monitor`** — Set up a named watch on a topic; returns changes since last check
+
+## Health check
+
+```bash
+curl https://intel.fusional.dev/health
+```
+
+```json
+{ "status": "ok", "service": "intelligence-mcp", "uptime": 9320 }
+```
+
+## Use cases
+
+- Research a competitor's pricing page without leaving the Claude conversation
+- Summarize 10 articles on a topic into a 3-point brief
+- Extract the technical specs from a vendor's documentation page
+- Monitor a keyword across sources and surface new results on demand
+
+## Cloud fallback
+
+When local inference is unavailable, the Intelligence MCP can route summarization tasks to the Anthropic API using the configured `ANTHROPIC_API_KEY`. Local inference via Christopher-AI is preferred when available.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Gateway" icon="server" href="/services/gateway">
+    The gateway routes `intel_*` tool calls to this server.
+  </Card>
+  <Card title="Christopher-AI" icon="brain" href="/christopher-ai/overview">
+    Local LLM used for summarization and inference tasks.
+  </Card>
+</Columns>

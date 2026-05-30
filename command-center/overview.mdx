@@ -1,0 +1,84 @@
+---
+title: "Command Center"
+description: "Live dashboard for FusionAL infrastructure health, metrics, and control"
+---
+
+## Overview
+
+The FusionAL Command Center is a Cloudflare Workers-hosted React dashboard that gives real-time visibility into the entire MCP stack.
+
+**URL:** [fusional-command-center.jonathanmelton-fusional.workers.dev](https://fusional-command-center.jonathanmelton-fusional.workers.dev)
+
+## Features
+
+### Service health grid
+
+All six MCP services are polled every 3 seconds. Each card shows:
+
+- **Status** — `online`, `offline`, `warning`, or `checking`
+- **Latency** — HTTP response time in milliseconds
+- **HTTP code** — Last response status code
+- **Port** — Internal port for reference
+- **Start / Stop controls** — Sends commands to the Management API
+
+### System overview
+
+Four summary cards at the top of the page:
+
+| Card | What it shows |
+|---|---|
+| Total Services | Count of registered services |
+| Online | Count of healthy services (and offline count) |
+| Avg Latency | Mean response time across all online services |
+| Health Checks | Poll status — "Live" when all checks complete, "Polling…" during in-flight checks |
+
+### Metrics chart
+
+A rolling 30-point time-series chart shows:
+
+- **Avg Latency (ms)** — Health poll response time trend
+- **Online** — Count of healthy services over time
+
+The chart auto-scrolls as new poll results arrive.
+
+### Event log
+
+A live feed of status change events — service goes offline, service recovers, start/stop actions. The last 20 events are retained. Each entry shows message, timestamp, and affected service subdomain.
+
+### Christopher-AI chat
+
+The bottom panel provides a direct chat interface to [Christopher-AI](/christopher-ai/overview). Features:
+
+- Full conversation history within the session
+- Configurable llama.cpp endpoint URL
+- Configurable system prompt
+- Connection test button
+- Stack info sidebar (hardware, model, host)
+- Langfuse tracing on every generation
+
+## Architecture
+
+The Command Center is a static React app deployed to Cloudflare Workers. It makes browser-side HTTP requests to:
+
+- Each service's public subdomain (`*.fusional.dev`) for health checks
+- The Management API at `http://100.65.9.40:8099` for start/stop actions
+- Christopher-AI at `https://christopher.fusional.dev` for chat completions
+
+<Note>
+  The Management API is only accessible via Tailscale. The Command Center's start/stop controls require your device to be on the Tailscale network. Health checks work from any network since they hit the public Cloudflare tunnel subdomains.
+</Note>
+
+## Observability
+
+Langfuse is running on T3610 at `http://100.65.9.40:3000`. All Christopher-AI completions triggered from the Command Center are traced there — prompt, output, token counts, model parameters, and latency.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Service Controls" icon="play" href="/command-center/service-controls">
+    How start/stop commands flow through the Management API.
+  </Card>
+  <Card title="Management API" icon="terminal" href="/infrastructure/management-api">
+    The API that backs the start/stop controls.
+  </Card>
+</Columns>

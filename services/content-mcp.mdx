@@ -1,0 +1,56 @@
+---
+title: "Content Automation MCP"
+description: "Tools for drafting, publishing, and managing content workflows"
+---
+
+## Overview
+
+The Content Automation MCP gives Claude tools for managing content pipelines — drafting, formatting, scheduling, and publishing across platforms. It eliminates the copy-paste loop between Claude and content tools.
+
+**Endpoint:** `https://content.fusional.dev`
+**Port:** 8103
+**Health:** `https://content.fusional.dev/health`
+**Tool prefix:** `content_*`
+
+## Tools
+
+- **`content_draft`** — Generate a draft for a specified format (blog post, email, social post, etc.)
+- **`content_format`** — Transform content between formats (markdown → HTML, plain text → structured)
+- **`content_publish`** — Push content to a connected publishing target (CMS, Notion, etc.)
+- **`content_schedule`** — Queue content for future publication
+- **`content_list`** — List queued or published content items
+
+## Connected platforms
+
+Platforms are configured via environment variables at container start. Supported targets include:
+
+- Notion (pages and databases)
+- Dev.to (article publication)
+- Generic webhook targets (for custom CMS integrations)
+
+## Health check
+
+```bash
+curl https://content.fusional.dev/health
+```
+
+```json
+{ "status": "ok", "service": "content-automation-mcp", "uptime": 7210 }
+```
+
+## Use cases
+
+- Have Claude write and publish a dev.to article in one conversation, no copy-paste
+- Draft LinkedIn posts from bullet points and schedule them via webhook
+- Auto-format raw notes into structured Notion pages
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Gateway" icon="server" href="/services/gateway">
+    The gateway routes `content_*` tool calls to this server.
+  </Card>
+  <Card title="API Integration Hub" icon="plug" href="/services/api-hub">
+    For more general external API access patterns.
+  </Card>
+</Columns>

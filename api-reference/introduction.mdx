@@ -1,33 +1,67 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Reference"
+description: "FusionAL HTTP APIs — health, service control, and LLM completions"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Overview
 
-## Welcome
+FusionAL exposes three categories of HTTP APIs:
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+| API | Base URL | Access |
+|---|---|---|
+| Service health endpoints | `https://<service>.fusional.dev/health` | Public |
+| Management API | `http://100.65.9.40:8099` | Tailscale only |
+| Christopher-AI completions | `https://christopher.fusional.dev` | Public |
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+All service health endpoints return JSON. The Management API accepts `POST` requests with no body for start/stop actions. Christopher-AI uses the llama.cpp native HTTP API.
 
-## Authentication
+## Health endpoints
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Every FusionAL service exposes `GET /health`. No authentication required.
+
+```bash
+curl https://gateway.fusional.dev/health
+curl https://bi.fusional.dev/health
+curl https://api.fusional.dev/health
+curl https://content.fusional.dev/health
+curl https://intel.fusional.dev/health
+curl https://christopher.fusional.dev/health
+```
+
+A healthy service returns HTTP `200` with a JSON body:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{ "status": "ok", "service": "<service-name>", "uptime": 12345 }
 ```
+
+## Management API
+
+Start and stop services via POST requests to `http://100.65.9.40:8099`. Requires Tailscale network access.
+
+```bash
+curl -X POST http://100.65.9.40:8099/start/gateway
+curl -X POST http://100.65.9.40:8099/stop/bi-mcp
+```
+
+See [Start/Stop Endpoints](/api-reference/endpoint/start-stop) for full reference.
+
+## Christopher-AI completions
+
+The Christopher-AI llama.cpp server exposes the native llama.cpp HTTP API (not OpenAI-compatible `/v1/chat/completions`).
+
+```bash
+curl -X POST https://christopher.fusional.dev/completion \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "### User\nHello\n\n### Assistant\n", "n_predict": 128}'
+```
+
+See [Completion Endpoint](/api-reference/endpoint/completion) for full reference.
+
+## Error codes
+
+| Code | Meaning |
+|---|---|
+| `200` | OK |
+| `502` | Bad gateway — usually a tunnel misconfiguration (http vs https) |
+| `503` | Service unavailable — upstream MCP server is down |
+| `504` | Gateway timeout — upstream didn't respond within the timeout window |

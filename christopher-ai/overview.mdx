@@ -1,0 +1,113 @@
+---
+title: "Christopher-AI"
+description: "Self-hosted LLM running on dedicated hardware — private inference, no API costs"
+---
+
+## Overview
+
+Christopher-AI is FusionAL's local inference layer. It runs llama.cpp on a dedicated T3610 workstation with CUDA acceleration, exposed via the FusionAL infrastructure as a private alternative to cloud LLM APIs.
+
+**Endpoint:** `https://christopher.fusional.dev`
+**Port:** 8090
+**Health:** `https://christopher.fusional.dev/health`
+**Model:** Llama-3.2-3B-Instruct-Q4\_K\_M (default)
+
+## Hardware
+
+| Component | Spec |
+|---|---|
+| Host | Dell T3610 (`just2awesome`) |
+| GPU | NVIDIA GTX 1050 Ti |
+| VRAM | 4 GB |
+| Network | Tailscale (100.65.9.40) |
+| ASR | whisper.cpp |
+| TTS | Piper |
+
+The GTX 1050 Ti offloads all model layers to GPU (`-ngl 99`), giving acceptable throughput for a 3B quantized model. Larger models require a VRAM upgrade.
+
+## Stack
+
+Christopher-AI is a multi-modal local assistant stack:
+
+- **LLM:** llama.cpp serving `Llama-3.2-3B-Instruct-Q4_K_M.gguf`
+- **ASR:** whisper.cpp for speech-to-text input
+- **TTS:** Piper for text-to-speech output
+- **Transport:** llama.cpp HTTP server (OpenAI-compatible API)
+
+## API format
+
+Christopher-AI uses the llama.cpp native HTTP API, not the OpenAI-compatible `/v1/chat/completions` format. The completion endpoint accepts:
+
+```bash
+POST https://christopher.fusional.dev/completion
+Content-Type: application/json
+
+{
+  "prompt": "### User\nWhat is the capital of France?\n\n### Assistant\n",
+  "n_predict": 256,
+  "temperature": 0.7,
+  "stop": ["### User", "### System", "</s>"],
+  "stream": false
+}
+```
+
+Response:
+
+```json
+{
+  "content": "Paris.",
+  "tokens_evaluated": 18,
+  "tokens_predicted": 3,
+  "stop": true
+}
+```
+
+## Health check
+
+```bash
+curl https://christopher.fusional.dev/health
+```
+
+```json
+{ "status": "ok" }
+```
+
+## Prompt format
+
+Christopher uses the standard Llama 3 instruct format:
+
+```
+### System
+<system prompt>
+
+### User
+<user message>
+
+### Assistant
+<model response>
+```
+
+Always include `["### User", "### System", "</s>"]` in the stop token list to prevent the model from generating role labels on its own.
+
+## Observability
+
+Conversations with Christopher-AI are traced via [Langfuse](https://langfuse.com) running on T3610 at port 3000. Traces include prompt, completion, token counts, and latency.
+
+## Endpoint maintainer
+
+A Cloudflare Workers cron job (`christopher-endpoint-maintainer`) probes Christopher-AI every 5 minutes and alerts on downtime. Deployed at:
+
+```
+christopher-endpoint-maintainer.jonathanmelton-fusional.workers.dev
+```
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Configuration" icon="sliders" href="/christopher-ai/configuration">
+    Startup flags, model selection, and system prompt customization.
+  </Card>
+  <Card title="Command Center" icon="gauge" href="/command-center/overview">
+    Chat with Christopher directly from the dashboard.
+  </Card>
+</Columns>

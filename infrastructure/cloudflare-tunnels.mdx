@@ -1,0 +1,107 @@
+---
+title: "Cloudflare Tunnels"
+description: "How FusionAL exposes T3610 services to the internet without port-forwarding"
+---
+
+## Overview
+
+FusionAL uses Cloudflare Tunnel to expose services running on T3610 over public hostnames. `cloudflared` runs on T3610 and maintains persistent connections to Cloudflare's edge — no firewall rules, no port-forwarding, no static IP required.
+
+## Tunnel management
+
+The `fusional` tunnel is **dashboard-managed via Cloudflare Zero Trust**. This means:
+
+- Ingress rules are configured in the Zero Trust dashboard, **not** in `~/.cloudflared/config.yml`
+- `config.yml` is used only for tunnel credentials and startup flags
+- Changes made in the dashboard take effect within ~30 seconds without restarting cloudflared
+
+<Warning>
+  Do not add public hostnames to `config.yml`. When dashboard management is active, cloudflared pulls ingress from Cloudflare's control plane on startup and overwrites any local ingress configuration. Local `config.yml` ingress is silently ignored.
+</Warning>
+
+## Adding a public hostname
+
+1. Cloudflare Dashboard → Zero Trust → Networks → Tunnels
+2. Select the `fusional` tunnel
+3. Click **Public Hostnames** → **Add a public hostname**
+4. Set the subdomain, domain, and service URL
+5. **Always set the service URL to `http://localhost:<port>`** — not `https://`
+
+<Warning>
+  The dashboard defaults the service protocol to `https://`. FusionAL services (FastAPI, llama.cpp) are plain HTTP. Setting `https://` will cause a TLS handshake failure: `tls: first record does not look like a TLS handshake`.
+</Warning>
+
+## Current hostname routing
+
+| Hostname | Service URL (internal) |
+|---|---|
+| `gateway.fusional.dev` | `http://localhost:8009` |
+| `bi.fusional.dev` | `http://localhost:8101` |
+| `api.fusional.dev` | `http://localhost:8102` |
+| `content.fusional.dev` | `http://localhost:8103` |
+| `intel.fusional.dev` | `http://localhost:8104` |
+| `christopher.fusional.dev` | `http://localhost:8090` |
+| `kb.fusional.dev` | `http://localhost:8106` |
+
+`github.fusional.dev` (port 8105) is intentionally not publicly tunneled.
+
+## cloudflared as a service
+
+Register cloudflared as a systemd service on T3610 so it survives reboots:
+
+```bash
+sudo cloudflared service install
+sudo systemctl enable cloudflared
+sudo systemctl start cloudflared
+```
+
+Check status:
+
+```bash
+sudo systemctl status cloudflared
+journalctl -u cloudflared -f
+```
+
+## Verifying tunnel health
+
+```bash
+ssh t3610 "cloudflared tunnel info fusional"
+```
+
+You should see the tunnel status as `healthy` and the connector listed.
+
+## Orphaned tunnels
+
+If you create a tunnel via CLI without adding public hostnames, it shows as an unrouted tunnel in the dashboard. To clean up:
+
+```bash
+ssh t3610 "cloudflared tunnel delete <tunnel-id>"
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="502 Bad Gateway from tunnel">
+    Almost always means the service URL in the dashboard is set to `https://` instead of `http://`. Edit the hostname in Zero Trust → Tunnels → [tunnel] → Public Hostnames → Edit.
+  </Accordion>
+  <Accordion title="Hostname not routing after config.yml change">
+    The tunnel is dashboard-managed. Local `config.yml` ingress is ignored. Add the hostname via the Zero Trust dashboard instead.
+  </Accordion>
+  <Accordion title="cloudflared not starting after reboot">
+    Check if it's registered as a systemd service: `systemctl status cloudflared`. If not enabled, run `sudo cloudflared service install` and then `sudo systemctl enable cloudflared`.
+  </Accordion>
+  <Accordion title="Dashboard shows tunnel as unhealthy">
+    Check if cloudflared is running on T3610: `systemctl status cloudflared`. Check if T3610 has internet access. The tunnel connection originates from T3610 — if the host is down or offline, the tunnel goes unhealthy.
+  </Accordion>
+</AccordionGroup>
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Architecture" icon="diagram-project" href="/infrastructure/architecture">
+    How the tunnel layer fits into the full system diagram.
+  </Card>
+  <Card title="Management API" icon="terminal" href="/infrastructure/management-api">
+    The Tailscale-only API that doesn't use Cloudflare tunnels.
+  </Card>
+</Columns>

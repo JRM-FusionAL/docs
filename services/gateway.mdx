@@ -1,0 +1,84 @@
+---
+title: "FusionAL Gateway"
+description: "The MCP proxy layer that eliminates token bloat from multi-server setups"
+---
+
+## Overview
+
+The FusionAL Gateway is the core of the stack. It presents a single MCP endpoint to Claude Desktop while routing tool calls to the appropriate upstream server behind the scenes.
+
+**Endpoint:** `https://gateway.fusional.dev/mcp/`
+**Port:** 8009
+**Health:** `https://gateway.fusional.dev/health`
+
+## Why a gateway?
+
+Claude Desktop's MCP implementation loads every configured server's full tool schema into the conversation context at session start. With 6 servers and 10–20 tools each, you're injecting 60–120 tool definitions into every message — even when the task needs only one.
+
+The gateway solves this by:
+
+1. **Single schema exposure** — Claude Desktop sees one server, one schema
+2. **Selective forwarding** — tool calls are routed only to the target server; unused server schemas don't appear in context
+3. **Centralized auth** — upstream servers can require internal tokens; Claude Desktop only authenticates to the gateway
+
+## Configuration in Claude Desktop
+
+```json
+{
+  "mcpServers": {
+    "fusional": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-fetch", "https://gateway.fusional.dev/mcp/"]
+    }
+  }
+}
+```
+
+## Routing
+
+The gateway routes based on tool name prefixes. Each upstream server registers its tools with a service-specific prefix:
+
+| Prefix | Upstream Server |
+|---|---|
+| `bi_*` | Business Intelligence MCP (:8101) |
+| `api_*` | API Integration Hub (:8102) |
+| `content_*` | Content Automation MCP (:8103) |
+| `intel_*` | Intelligence MCP (:8104) |
+| `github_*` | GitHub MCP Safe (:8105) |
+
+## Health check
+
+```bash
+curl https://gateway.fusional.dev/health
+```
+
+```json
+{
+  "status": "ok",
+  "service": "fusional-gateway",
+  "upstream": {
+    "bi-mcp": "ok",
+    "api-hub": "ok",
+    "content-mcp": "ok",
+    "intel-mcp": "ok",
+    "github-mcp": "ok"
+  }
+}
+```
+
+## Token impact
+
+Running 6 MCP servers directly in Claude Desktop typically adds 4,000–8,000 tokens to every conversation context. Through the gateway, context overhead drops to a single schema — roughly 500–1,000 tokens depending on tool count.
+
+For a team running 100 conversations per day, that's a meaningful reduction in API spend.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Connect Claude Desktop in 5 minutes.
+  </Card>
+  <Card title="Management API" icon="terminal" href="/infrastructure/management-api">
+    Start and stop the gateway via the management API.
+  </Card>
+</Columns>

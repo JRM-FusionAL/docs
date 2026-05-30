@@ -1,0 +1,108 @@
+---
+title: "Christopher-AI Configuration"
+description: "Startup flags, model selection, and deployment options"
+---
+
+## Starting the server
+
+Christopher-AI runs as a bare llama.cpp process (not Docker). Start it on the T3610:
+
+```bash
+./llama-server \
+  -m /path/to/Llama-3.2-3B-Instruct-Q4_K_M.gguf \
+  --host 0.0.0.0 \
+  --port 8090 \
+  -ngl 99
+```
+
+| Flag | Value | Purpose |
+|---|---|---|
+| `-m` | path to `.gguf` | Model file |
+| `--host` | `0.0.0.0` | Bind to all interfaces (required for Cloudflare tunnel) |
+| `--port` | `8090` | Must match tunnel config |
+| `-ngl` | `99` | GPU layers — set to 0 for CPU-only |
+
+## Systemd service
+
+For persistent deployment, register as a systemd service on T3610:
+
+```ini
+[Unit]
+Description=Christopher-AI llama.cpp server
+After=network.target
+
+[Service]
+Type=simple
+User=jrm_fusional
+WorkingDirectory=/home/jrm_fusional/Projects/Christopher-AI
+ExecStart=/home/jrm_fusional/Projects/Christopher-AI/llama-server \
+  -m /home/jrm_fusional/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf \
+  --host 0.0.0.0 \
+  --port 8090 \
+  -ngl 99
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable christopher-ai
+sudo systemctl start christopher-ai
+```
+
+## Model selection
+
+The default model is `Llama-3.2-3B-Instruct-Q4_K_M.gguf`. This fits in 4 GB VRAM with room to spare.
+
+Recommended upgrade path for the T3610 GTX 1050 Ti:
+
+| Model | VRAM required | Notes |
+|---|---|---|
+| Llama-3.2-3B Q4\_K\_M | ~2 GB | Default. Fast, good for chat. |
+| Qwen2.5-7B Q4\_K\_M | ~4.5 GB | Significantly better tool use |
+| Llama-3.1-8B Q4\_K\_M | ~5 GB | Exceeds VRAM — CPU overflow |
+
+<Note>
+  Upgrading to Qwen2.5-7B-Instruct Q4\_K\_M is the highest-value improvement for Christopher-AI tool use quality. It fits with `-ngl 28` on the 1050 Ti (partial GPU offload).
+</Note>
+
+## Cloudflare Tunnel configuration
+
+The `christopher.fusional.dev` hostname is managed via Cloudflare Zero Trust dashboard. The tunnel routes to `http://localhost:8090` — plain HTTP, not HTTPS.
+
+<Warning>
+  When adding public hostnames in the Cloudflare dashboard, explicitly set the service URL to `http://localhost:8090` — the dashboard defaults to `https://`, which will cause a TLS handshake failure against the llama.cpp HTTP server.
+</Warning>
+
+## System prompt customization
+
+The default system prompt used by the Command Center chat:
+
+```
+You are Christopher, an intelligent assistant running locally on a JRM FusionAL server. Be concise, direct, and helpful.
+```
+
+Override it in the Command Center sidebar or in API calls by including a `### System` block at the start of the prompt.
+
+## Endpoint maintainer
+
+A Cloudflare Worker monitors Christopher-AI every 5 minutes. To check probe history:
+
+1. Cloudflare Dashboard → Workers & Pages → `christopher-endpoint-maintainer`
+2. Navigate to **Observability** → **Logs**
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Christopher-AI Overview" icon="brain" href="/christopher-ai/overview">
+    Hardware specs, API format, and prompt structure.
+  </Card>
+  <Card title="Cloudflare Tunnels" icon="cloud" href="/infrastructure/cloudflare-tunnels">
+    How tunnels route traffic to Christopher-AI and other services.
+  </Card>
+</Columns>

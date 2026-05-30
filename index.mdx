@@ -1,97 +1,73 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "FusionAL"
+description: "Self-hosted MCP gateway that eliminates token bloat from multi-server Claude Desktop setups"
 ---
 
-## Setting up
+## What is FusionAL?
 
-Get your documentation site up and running in minutes.
+FusionAL is a self-hosted [Model Context Protocol](https://modelcontextprotocol.io) gateway that solves a specific enterprise problem: **token bloat from multi-server MCP setups**.
+
+When Claude Desktop loads 6+ MCP servers, every conversation pays the context cost of all their schemas — whether or not you use them. FusionAL sits in front of your MCP stack and exposes a single endpoint to Claude Desktop. It routes tool calls to the right upstream server, filters what's in context, and keeps token counts under control.
 
 <Card
-  title="Start here"
+  title="Connect in 5 minutes"
   icon="rocket"
   href="/quickstart"
   horizontal
 >
-  Follow our three step quickstart guide.
+  One config line in Claude Desktop. All your MCP tools, none of the bloat.
 </Card>
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
+## Architecture
 
 <Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+  <Card title="FusionAL Gateway" icon="server" href="/services/gateway">
+    The core MCP proxy. Single entry point for Claude Desktop; routes to all downstream servers.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="MCP Services" icon="puzzle-piece" href="/services/bi-mcp">
+    Six specialized MCP servers: BI, API integration, content, intelligence, and GitHub — all behind the gateway.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Christopher-AI" icon="brain" href="/christopher-ai/overview">
+    Self-hosted LLM running llama.cpp on dedicated hardware. Private inference, no API costs.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Command Center" icon="gauge" href="/command-center/overview">
+    Live dashboard for service health, latency metrics, start/stop controls, and Christopher-AI chat.
   </Card>
 </Columns>
 
-## Create beautiful pages
+## Live Infrastructure
 
-Everything you need to create world-class documentation.
+All services run on a dedicated T3610 workstation and are exposed via Cloudflare tunnels.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+| Service | Endpoint | Port |
+|---|---|---|
+| Gateway | `gateway.fusional.dev` | 8009 |
+| Business Intelligence MCP | `bi.fusional.dev` | 8101 |
+| API Integration Hub | `api.fusional.dev` | 8102 |
+| Content Automation MCP | `content.fusional.dev` | 8103 |
+| Intelligence MCP | `intel.fusional.dev` | 8104 |
+| GitHub MCP Safe | `github.fusional.dev` | 8105 |
+| Christopher-AI | `christopher.fusional.dev` | 8090 |
+| Management API | `100.65.9.40:8099` | 8099 |
 
-## Need inspiration?
+## The Token Bloat Problem
+
+Every MCP server you add to Claude Desktop injects its full tool schema into every conversation context. With 6 servers averaging 15 tools each, you're paying for 90 tool definitions on every message — even when you only need `read_file`.
+
+FusionAL fixes this at the routing layer. Claude Desktop sees one server with one schema. The gateway handles routing, filtering, and upstream auth internally.
 
 <Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
+  title="Self-host FusionAL"
+  icon="hard-drive"
+  href="/development"
 >
-  Browse our showcase of exceptional documentation sites.
+  Run the full stack locally. Docker Compose, one command.
 </Card>
+
+## Roadmap
+
+**FusionAL Gateway** (live) — unified MCP tool access, token bloat elimination
+
+**FusionAL Recall** (in build) — operational memory as MCP. Solved-issues registry accessible to any Claude session.
+
+**FusionAL KB Bridge** (planned) — expose private docs, wikis, and knowledge bases to any LLM via MCP.

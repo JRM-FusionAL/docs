@@ -1,0 +1,80 @@
+---
+title: "GitHub MCP Safe"
+description: "Read-scoped GitHub access with controlled write operations"
+---
+
+## Overview
+
+GitHub MCP Safe gives Claude access to your GitHub repositories with safety rails built in. It's designed for teams where you want Claude to read code, search issues, and understand PRs — but not push or delete without explicit human approval.
+
+**Endpoint:** `https://github.fusional.dev`
+**Port:** 8105
+**Health:** `https://github.fusional.dev/health`
+**Tool prefix:** `github_*`
+**Access:** Internal only (not publicly exposed via Cloudflare tunnel)
+
+<Note>
+  The GitHub MCP Safe endpoint is not publicly routed through Cloudflare. It's only accessible via Tailscale or local network. This is intentional — GitHub credentials should never traverse a public tunnel.
+</Note>
+
+## Tools
+
+Read operations (always available):
+
+- **`github_read_file`** — Read a file from a repository at a given ref
+- **`github_search_code`** — Search code across repositories
+- **`github_list_prs`** — List open pull requests
+- **`github_get_pr`** — Get the diff and metadata for a pull request
+- **`github_list_issues`** — List issues with optional filters
+- **`github_get_issue`** — Get a specific issue's content and comments
+
+Write operations (require explicit confirmation):
+
+- **`github_create_pr`** — Create a pull request (requires `ALLOW_WRITES=true`)
+- **`github_comment`** — Post a comment on an issue or PR
+- **`github_create_issue`** — Create a new issue
+
+## Safety model
+
+The server enforces a two-layer safety model:
+
+1. **Scope restriction** — The GitHub PAT configured for this server should be scoped to `repo:read` by default. Write operations require a separately configured write-scoped token.
+2. **Allowlist** — You can restrict which repositories Claude can access via `REPO_ALLOWLIST` environment variable.
+
+## Configuration
+
+```bash
+GITHUB_PAT=github_pat_...       # Read-scoped PAT (required)
+GITHUB_WRITE_PAT=github_pat_... # Write-scoped PAT (optional, for write tools)
+REPO_ALLOWLIST=org/repo1,org/repo2  # Comma-separated list (optional)
+```
+
+<Warning>
+  Never embed the GitHub PAT in `claude_desktop_config.json` or any plaintext config. Use environment variables only. Rotate immediately if a token is ever logged or committed.
+</Warning>
+
+## Health check
+
+```bash
+# Accessible via Tailscale only
+curl http://100.65.9.40:8105/health
+```
+
+```json
+{ "status": "ok", "service": "github-mcp-safe", "scope": "read" }
+```
+
+## Dependabot
+
+Dependabot is enabled on the GitHub MCP Safe repo. Dependency PRs appear automatically and Claude can review them via `github_get_pr`.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Gateway" icon="server" href="/services/gateway">
+    The gateway routes `github_*` tool calls to this server.
+  </Card>
+  <Card title="API Integration Hub" icon="plug" href="/services/api-hub">
+    For non-GitHub API integrations with similar credential safety patterns.
+  </Card>
+</Columns>

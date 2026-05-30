@@ -1,0 +1,66 @@
+---
+title: "API Integration Hub"
+description: "Connect Claude to external APIs without exposing credentials"
+---
+
+## Overview
+
+The API Integration Hub is an MCP server that acts as a secure proxy between Claude and external APIs. It stores API credentials server-side and exposes clean tools that Claude can call — no keys in the conversation context.
+
+**Endpoint:** `https://api.fusional.dev`
+**Port:** 8102
+**Health:** `https://api.fusional.dev/health`
+**Tool prefix:** `api_*`
+
+## Why a hub?
+
+When Claude calls an external API directly, the API key must be in the conversation or in Claude's tool parameters — both are context-visible and log-visible. The API Integration Hub:
+
+1. Stores credentials in server environment variables, not in the conversation
+2. Enforces an allowlist of permitted endpoints per integration
+3. Normalizes response formats so Claude gets consistent output regardless of upstream API shape
+
+## Tools
+
+- **`api_call`** — Make an authenticated request to a registered integration
+- **`api_list`** — List available configured integrations
+- **`api_status`** — Check the status of a specific integration's upstream service
+
+## Registered integrations
+
+Integrations are configured via environment variables at container start. Common patterns:
+
+```bash
+INTEGRATION_NOTION_KEY=secret_...
+INTEGRATION_NOTION_VERSION=2022-06-28
+INTEGRATION_SLACK_TOKEN=xoxb-...
+```
+
+Claude calls `api_call` with the integration name; the hub resolves the credential and forwards the request.
+
+## Health check
+
+```bash
+curl https://api.fusional.dev/health
+```
+
+```json
+{ "status": "ok", "service": "api-integration-hub", "integrations": 4 }
+```
+
+## Use cases
+
+- Let Claude post to Slack without the Slack token ever appearing in context
+- Pull Notion pages on demand without embedding the Notion API key in Claude Desktop config
+- Wrap any HTTP API in a Claude-friendly tool with server-side auth
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Gateway" icon="server" href="/services/gateway">
+    The gateway routes `api_*` tool calls to this server.
+  </Card>
+  <Card title="GitHub MCP Safe" icon="github" href="/services/github-mcp">
+    GitHub-specific MCP with read-scoped access controls.
+  </Card>
+</Columns>

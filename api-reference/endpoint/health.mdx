@@ -1,0 +1,79 @@
+---
+title: "Health Endpoints"
+description: "Check the status of any FusionAL service"
+---
+
+## GET /health
+
+All FusionAL services expose a `/health` endpoint. No authentication required.
+
+### Service URLs
+
+| Service | Health URL |
+|---|---|
+| Gateway | `https://gateway.fusional.dev/health` |
+| Business Intelligence MCP | `https://bi.fusional.dev/health` |
+| API Integration Hub | `https://api.fusional.dev/health` |
+| Content Automation MCP | `https://content.fusional.dev/health` |
+| Intelligence MCP | `https://intel.fusional.dev/health` |
+| Christopher-AI | `https://christopher.fusional.dev/health` |
+| GitHub MCP Safe | `http://100.65.9.40:8105/health` (Tailscale only) |
+| Management API | `http://100.65.9.40:8099/health` (Tailscale only) |
+
+### Request
+
+```bash
+curl https://gateway.fusional.dev/health
+```
+
+### Response
+
+<Tabs>
+  <Tab title="200 OK — healthy">
+    ```json
+    {
+      "status": "ok",
+      "service": "fusional-gateway",
+      "uptime": 18340
+    }
+    ```
+  </Tab>
+  <Tab title="503 — service down">
+    Service returns no response or non-2xx. The Cloudflare tunnel itself may return a `502` if the backend is unreachable.
+  </Tab>
+</Tabs>
+
+### Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `status` | string | `"ok"` when healthy |
+| `service` | string | Internal service name |
+| `uptime` | number | Seconds since the service started |
+
+### Gateway aggregate health
+
+The gateway `/health` endpoint also reports upstream status:
+
+```bash
+curl https://gateway.fusional.dev/health
+```
+
+```json
+{
+  "status": "ok",
+  "service": "fusional-gateway",
+  "uptime": 18340,
+  "upstream": {
+    "bi-mcp": "ok",
+    "api-hub": "ok",
+    "content-mcp": "ok",
+    "intel-mcp": "ok",
+    "github-mcp": "ok"
+  }
+}
+```
+
+### Polling interval
+
+The Command Center polls all health endpoints every **3 seconds**. For external monitoring, a 30–60 second interval is recommended to avoid unnecessary load.

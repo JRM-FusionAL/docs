@@ -1,0 +1,116 @@
+---
+title: "Completion"
+description: "Generate text completions via Christopher-AI (llama.cpp)"
+---
+
+## POST /completion
+
+Send a prompt to Christopher-AI and receive a completion. Uses the native llama.cpp HTTP API.
+
+**Endpoint:** `https://christopher.fusional.dev/completion`
+
+### Request
+
+```bash
+curl -X POST https://christopher.fusional.dev/completion \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "### System\nYou are a helpful assistant.\n\n### User\nWhat is 2 + 2?\n\n### Assistant\n",
+    "n_predict": 128,
+    "temperature": 0.7,
+    "stop": ["### User", "### System", "</s>"],
+    "stream": false
+  }'
+```
+
+### Request body
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `prompt` | string | — | Full prompt string including role markers |
+| `n_predict` | integer | 128 | Max tokens to generate |
+| `temperature` | float | 0.8 | Sampling temperature (0.0 = deterministic) |
+| `stop` | string[] | `[]` | Stop sequences — always include role markers |
+| `stream` | boolean | false | Stream tokens as they generate |
+
+### Prompt format
+
+Christopher uses Llama 3 instruct format. Always structure your prompt with role markers:
+
+```
+### System
+<optional system prompt>
+
+### User
+<user message>
+
+### Assistant
+<leave blank — model completes from here>
+```
+
+Always include `["### User", "### System", "</s>"]` in the `stop` array to prevent the model from generating additional role turns.
+
+### Response
+
+```json
+{
+  "content": "2 + 2 equals 4.",
+  "tokens_evaluated": 32,
+  "tokens_predicted": 8,
+  "stop": true,
+  "stopped_eos": false,
+  "stopped_word": true,
+  "stopping_word": "### User",
+  "timings": {
+    "prompt_ms": 120.4,
+    "predicted_ms": 88.2,
+    "predicted_per_second": 18.3
+  }
+}
+```
+
+### Response fields
+
+| Field | Type | Description |
+|---|---|---|
+| `content` | string | Generated text (without the stop token) |
+| `tokens_evaluated` | integer | Prompt tokens processed |
+| `tokens_predicted` | integer | Tokens generated |
+| `stop` | boolean | Whether generation stopped early |
+| `stopped_word` | boolean | Stopped due to a stop sequence |
+| `stopping_word` | string | Which stop sequence triggered the stop |
+| `timings.predicted_per_second` | float | Generation speed in tokens/second |
+
+### Health check
+
+```bash
+curl https://christopher.fusional.dev/health
+```
+
+```json
+{ "status": "ok" }
+```
+
+### Streaming
+
+Set `"stream": true` to receive tokens as Server-Sent Events:
+
+```bash
+curl -X POST https://christopher.fusional.dev/completion \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "...", "n_predict": 256, "stream": true}'
+```
+
+Each event is a JSON object with a `content` field containing the new token(s). The final event has `"stop": true`.
+
+### Typical performance
+
+On the T3610 with GTX 1050 Ti and `Llama-3.2-3B-Instruct-Q4_K_M`:
+
+| Metric | Value |
+|---|---|
+| Prompt processing | ~8 tokens/second |
+| Generation | ~15–20 tokens/second |
+| Latency (first token) | ~1–3 seconds |
+
+Performance degrades significantly for prompts over ~2K tokens due to VRAM constraints.

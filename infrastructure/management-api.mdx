@@ -1,0 +1,112 @@
+---
+title: "Management API"
+description: "Start and stop FusionAL services via HTTP — Tailscale only"
+---
+
+## Overview
+
+The Management API is a lightweight HTTP service running on T3610 that accepts start and stop commands for MCP services. It's the backend for the Command Center's service control buttons.
+
+**Base URL:** `http://100.65.9.40:8099`
+**Access:** Tailscale only (not publicly exposed)
+**Port:** 8099
+
+## Authentication
+
+The Management API is network-restricted to Tailscale. It does not require an API key by default, relying on network-level access control. If you expose it beyond Tailscale, add bearer token auth via the `MGMT_API_TOKEN` environment variable.
+
+## Endpoints
+
+### Health
+
+```
+GET /health
+```
+
+```json
+{ "status": "ok", "service": "fusional-mgmt-api" }
+```
+
+### Start a service
+
+```
+POST /start/<service-key>
+```
+
+Starts the specified service. Returns `200 OK` when the command is dispatched (not when the service is fully up — poll `/health` on the target service to confirm).
+
+```bash
+curl -X POST http://100.65.9.40:8099/start/bi-mcp
+```
+
+```json
+{ "action": "start", "service": "bi-mcp", "status": "dispatched" }
+```
+
+### Stop a service
+
+```
+POST /stop/<service-key>
+```
+
+Stops the specified service.
+
+```bash
+curl -X POST http://100.65.9.40:8099/stop/bi-mcp
+```
+
+```json
+{ "action": "stop", "service": "bi-mcp", "status": "dispatched" }
+```
+
+## Service keys
+
+| Key | Description |
+|---|---|
+| `gateway` | FusionAL Gateway |
+| `bi-mcp` | Business Intelligence MCP |
+| `api-hub` | API Integration Hub |
+| `content-mcp` | Content Automation MCP |
+| `intel-mcp` | Intelligence MCP |
+| `christopher-ai` | Christopher-AI (llama.cpp) |
+
+## Implementation
+
+The Management API executes docker-compose commands on the T3610 host:
+
+```bash
+# start: docker-compose start <service-key>
+# stop:  docker-compose stop <service-key>
+```
+
+For Christopher-AI, it spawns/kills the llama.cpp process directly since Christopher-AI runs outside Docker.
+
+<Note>
+  T3610 uses docker-compose v1 (`docker-compose` with a hyphen, not `docker compose`). The API accounts for this.
+</Note>
+
+## Accessing from a different Tailscale device
+
+The Management API is bound to the T3610 Tailscale IP (`100.65.9.40`). Any device on the same Tailscale network can reach it.
+
+In the Command Center, the Management API URL is configurable. If your T3610 Tailscale IP changes, update the field in the Command Center header.
+
+## Manual fallback
+
+If the Management API is unavailable, control services directly via SSH:
+
+```bash
+ssh t3610 "docker-compose -f ~/Projects/mcp-consulting-kit/compose.yaml start <service>"
+ssh t3610 "docker-compose -f ~/Projects/mcp-consulting-kit/compose.yaml stop <service>"
+```
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Service Controls" icon="play" href="/command-center/service-controls">
+    How the Command Center uses this API.
+  </Card>
+  <Card title="Architecture" icon="diagram-project" href="/infrastructure/architecture">
+    Where the Management API fits in the full system.
+  </Card>
+</Columns>

@@ -1,0 +1,116 @@
+---
+title: "Architecture"
+description: "How FusionAL's components fit together"
+---
+
+## System diagram
+
+```
+Claude Desktop
+      │
+      │  Single MCP entry (fusional)
+      ▼
+┌─────────────────────────────────┐
+│     FusionAL Gateway :8009      │  ← Cloudflare tunnel
+│     gateway.fusional.dev        │    (gateway.fusional.dev)
+└──────────────┬──────────────────┘
+               │  routes by tool prefix
+       ┌───────┴────────────────────────────┐
+       │                                    │
+  bi_* │  api_* │  content_* │  intel_* │  github_*
+       │
+┌──────▼──────┐  ┌──────────────┐  ┌──────────────────┐
+│  BI MCP     │  │  API Hub     │  │  Content MCP     │
+│  :8101      │  │  :8102       │  │  :8103           │
+│ bi.fusional │  │ api.fusional │  │ content.fusional │
+└─────────────┘  └──────────────┘  └──────────────────┘
+
+┌─────────────────┐  ┌────────────────────────┐
+│  Intelligence   │  │  GitHub MCP Safe       │
+│  MCP :8104      │  │  :8105 (Tailscale only)│
+│ intel.fusional  │  │  github.fusional.dev   │
+└─────────────────┘  └────────────────────────┘
+
+──── Separate stack ────────────────────────────────────
+
+┌────────────────────────────────┐
+│  Christopher-AI :8090          │
+│  llama.cpp (GTX 1050 Ti)       │
+│  christopher.fusional.dev      │
+└────────────────────────────────┘
+
+┌────────────────────────────────┐
+│  Management API :8099          │
+│  Tailscale only (100.65.9.40)  │
+└────────────────────────────────┘
+
+┌────────────────────────────────────────────────────┐
+│  Command Center (Cloudflare Workers)               │
+│  fusional-command-center.jonathanmelton-           │
+│  fusional.workers.dev                              │
+└────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│  Christopher Endpoint Maintainer (Cloudflare Workers)   │
+│  christopher-endpoint-maintainer.jonathanmelton-        │
+│  fusional.workers.dev — probes every 5 min              │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Layers
+
+### Network layer — Cloudflare Tunnels
+
+All public traffic enters through Cloudflare tunnels managed via Zero Trust dashboard. The `fusional` tunnel runs on T3610 and routes hostnames to local services:
+
+| Hostname | Internal target |
+|---|---|
+| `gateway.fusional.dev` | `http://localhost:8009` |
+| `bi.fusional.dev` | `http://localhost:8101` |
+| `api.fusional.dev` | `http://localhost:8102` |
+| `content.fusional.dev` | `http://localhost:8103` |
+| `intel.fusional.dev` | `http://localhost:8104` |
+| `christopher.fusional.dev` | `http://localhost:8090` |
+| `kb.fusional.dev` | `http://localhost:8106` (pending) |
+
+`github.fusional.dev` (port 8105) is not publicly tunneled — Tailscale only.
+
+### Compute layer — T3610
+
+All MCP services and Christopher-AI run on a single Dell T3610 workstation:
+
+- **OS:** Ubuntu (Linux)
+- **MCP stack:** Docker Compose containers
+- **Christopher-AI:** Bare llama.cpp process (no container)
+- **Tailscale IP:** `100.65.9.40`
+- **SSH alias:** `t3610`
+
+### Edge layer — Cloudflare Workers
+
+Two Workers run at the edge:
+
+1. **Command Center** — React SPA serving the monitoring dashboard
+2. **Christopher Endpoint Maintainer** — Cron Worker probing Christopher-AI every 5 minutes
+
+Workers have no direct access to T3610 — they make HTTP requests to the public tunnel endpoints.
+
+## Key design decisions
+
+**Single gateway entry for Claude Desktop** — reduces context token cost and simplifies credential management. One auth surface instead of six.
+
+**Cloudflare-managed tunnel ingress** — local `config.yml` ingress is ignored when Zero Trust manages the tunnel. All hostname routing is done via the dashboard.
+
+**Management API on Tailscale only** — start/stop commands are not publicly reachable. The Command Center sends these requests client-side; they work only when the user's device is on the Tailscale network.
+
+**Christopher-AI as bare process** — llama.cpp performs better without Docker's network and I/O overhead, especially for CUDA workloads on constrained VRAM.
+
+## Related
+
+<Columns cols={2}>
+  <Card title="Cloudflare Tunnels" icon="cloud" href="/infrastructure/cloudflare-tunnels">
+    Tunnel configuration and hostname management.
+  </Card>
+  <Card title="Management API" icon="terminal" href="/infrastructure/management-api">
+    The start/stop API running on Tailscale.
+  </Card>
+</Columns>

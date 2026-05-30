@@ -1,0 +1,43 @@
+---
+title: "Intelligence MCP"
+description: "Hot-topic discovery, business lead sourcing, and trending repo intelligence."
+---
+
+**Port:** 8104  
+**Path:** `showcase-servers/intelligence-mcp/`
+
+## What it does
+
+Surfaces trending topics, identifies business leads, and monitors GitHub activity — turning open web data into actionable intelligence.
+
+**Example prompts:**
+
+> *"What are the top trending GitHub repositories this week in the AI category?"*
+
+> *"Find companies in fintech that are hiring for MCP or LLM roles."*
+
+> *"What topics are trending on Hacker News right now?"*
+
+## Configuration
+
+No API keys required for base functionality.
+
+```bash
+# Optional: GitHub token increases API rate limits
+GITHUB_TOKEN=ghp_your_token_here
+```
+
+## Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `trending_repos` | Fetch trending GitHub repos by language or topic |
+| `hot_topics` | Surface trending discussions from Hacker News |
+| `lead_search` | Find companies by role, industry, or technology keywords |
+| `repo_intelligence` | Deep stats on a specific GitHub repo |
+
+## GitHub rate limits
+
+Without a token: 60 requests/hour. With `GITHUB_TOKEN`: 5,000 requests/hour.
+
+Set it in the server's `.env` file to avoid hitting rate limits during active use.

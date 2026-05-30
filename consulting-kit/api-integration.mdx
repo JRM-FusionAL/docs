@@ -1,0 +1,51 @@
+---
+title: "API Integration Hub"
+description: "Slack, GitHub Issues, and Stripe accessible via natural language."
+---
+
+**Port:** 8102  
+**Path:** `showcase-servers/api-integration-hub/`
+
+## What it does
+
+Connects Claude to Slack, GitHub Issues, and Stripe through natural language commands.
+
+**Example prompts:**
+
+> *"Post a message to #engineering saying the deploy is live."*
+
+> *"Open a GitHub issue on my repo titled 'Investigate login timeout'."*
+
+> *"Look up the Stripe customer for user@example.com and show their subscription status."*
+
+## Configuration
+
+```bash
+cp showcase-servers/api-integration-hub/.env.example \
+   showcase-servers/api-integration-hub/.env
+```
+
+Key variables:
+
+| Variable | Description |
+|----------|-------------|
+| `SLACK_BOT_TOKEN` | Slack bot token (`xoxb-...`) |
+| `SLACK_DEFAULT_CHANNEL` | Default channel for messages |
+| `GITHUB_TOKEN` | GitHub personal access token |
+| `GITHUB_DEFAULT_REPO` | Default repo (`owner/repo`) |
+| `STRIPE_API_KEY` | Stripe secret key (`sk_...`) |
+
+## Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `slack_send_message` | Post a message to a Slack channel |
+| `slack_list_channels` | List available channels |
+| `github_create_issue` | Create a GitHub issue |
+| `github_list_issues` | List open issues in a repo |
+| `stripe_lookup_customer` | Look up a Stripe customer by email |
+| `stripe_get_subscription` | Get subscription status for a customer |
+
+## Required Slack scopes
+
+Your Slack bot app needs: `chat:write`, `channels:read`, `channels:history`

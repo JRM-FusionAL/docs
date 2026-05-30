@@ -1,0 +1,55 @@
+---
+title: "POST /generate"
+description: "Generate and launch a new MCP server from a natural language description."
+---
+
+Generates a complete MCP server project from a plain English description, builds it in Docker, and registers it in the gateway.
+
+<Note>
+This endpoint requires `ANTHROPIC_API_KEY` to be set in `.env`. Claude generates the server code.
+</Note>
+
+## Request body
+
+```json
+{
+  "description": "An MCP server that queries a PostgreSQL database using natural language",
+  "name": "my-db-server"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `description` | string | Yes | What the MCP server should do |
+| `name` | string | Yes | Server name — used as Docker image tag and registry key |
+
+## Response
+
+```json
+{
+  "status": "registered",
+  "name": "my-db-server",
+  "url": "http://localhost:8110/mcp",
+  "port": 8110,
+  "build_log": "..."
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string | `"registered"` on success |
+| `name` | string | Server name |
+| `url` | string | MCP endpoint URL |
+| `port` | integer | Assigned port |
+| `build_log` | string | Docker build output |
+
+## Example
+
+```bash
+curl -X POST http://localhost:8009/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "description": "A server that returns the current time in any timezone",
+    "name": "time-server"
+  }'
+```

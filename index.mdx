@@ -1,20 +1,90 @@
 ---
+<<<<<<< HEAD
 title: "FusionAL"
 description: "Self-hosted MCP gateway that eliminates token bloat from multi-server Claude Desktop setups"
+=======
+title: "FusionAL Documentation"
+description: "Self-hosted MCP governance for teams that have already said yes to MCP."
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
 ---
 
 ## What is FusionAL?
 
+<<<<<<< HEAD
 FusionAL is a self-hosted [Model Context Protocol](https://modelcontextprotocol.io) gateway that solves a specific enterprise problem: **token bloat from multi-server MCP setups**.
 
 When Claude Desktop loads 6+ MCP servers, every conversation pays the context cost of all their schemas — whether or not you use them. FusionAL sits in front of your MCP stack and exposes a single endpoint to Claude Desktop. It routes tool calls to the right upstream server, filters what's in context, and keeps token counts under control.
 
 <Card
   title="Connect in 5 minutes"
+=======
+FusionAL is a **self-hosted MCP governance gateway** that sits between your AI clients and your tool servers. One endpoint. Central auth. Tool-level policy enforcement. Full audit trail. Deployable in a single Docker command.
+
+**The problem:** Every MCP server you connect loads its full tool manifest into Claude's context window before processing a single token. At 84 tools across several servers, that's 15,540 tokens consumed at session start — before your team has asked anything. At scale, that's cost, latency, and an audit surface nobody can explain to legal.
+
+## The FusionAL ecosystem
+
+<Columns cols={2}>
+  <Card
+    title="FusionAL Gateway"
+    icon="shield"
+    href="/quickstart"
+  >
+    The governance gateway. One SSE endpoint, central auth, tool-level policy enforcement, full audit trail. Start here.
+  </Card>
+  <Card
+    title="MCP Consulting Kit"
+    icon="server"
+    href="/consulting-kit/overview"
+  >
+    Four production-grade MCP servers: Business Intelligence, API Integration, Content Automation, and Intelligence.
+  </Card>
+  <Card
+    title="Christopher AI"
+    icon="microphone"
+    href="/christopher/overview"
+  >
+    Fully local voice AI. No cloud. No API keys. Built on whisper.cpp, llama.cpp, and Piper TTS.
+  </Card>
+  <Card
+    title="Connect AI Clients"
+    icon="plug"
+    href="/clients/claude-desktop"
+  >
+    Connect Claude Desktop, Cursor, Windsurf, and other MCP clients to your FusionAL gateway.
+  </Card>
+</Columns>
+
+## Why teams choose FusionAL
+
+<AccordionGroup>
+  <Accordion title="Token control" icon="gauge">
+    Filter which tools each client sees. Stop context bloat from scaling with your server count.
+  </Accordion>
+  <Accordion title="Audit-ready operations" icon="file-lines">
+    Every tool call logged with caller, input, latency, and response status.
+  </Accordion>
+  <Accordion title="Policy enforcement" icon="lock">
+    Control what tools run, for whom, and under what conditions.
+  </Accordion>
+  <Accordion title="Windows-hardened" icon="windows">
+    Six documented failure modes solved. None of them appear in official MCP docs.
+  </Accordion>
+  <Accordion title="AI-powered server generation" icon="wand-magic-sparkles">
+    Describe a tool in plain English — FusionAL generates, registers, and runs it automatically.
+  </Accordion>
+</AccordionGroup>
+
+## Start in 5 minutes
+
+<Card
+  title="Quickstart — FusionAL Gateway"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
   icon="rocket"
   href="/quickstart"
   horizontal
 >
+<<<<<<< HEAD
   One config line in Claude Desktop. All your MCP tools, none of the bloat.
 </Card>
 
@@ -71,3 +141,19 @@ FusionAL fixes this at the routing layer. Claude Desktop sees one server with on
 **FusionAL Recall** (in build) — operational memory as MCP. Solved-issues registry accessible to any Claude session.
 
 **FusionAL KB Bridge** (planned) — expose private docs, wikis, and knowledge bases to any LLM via MCP.
+=======
+  Clone, start the gateway, and connect Claude Desktop. Five minutes.
+</Card>
+
+## Consulting
+
+Don't want to self-manage? FusionAL offers done-for-you MCP deployments.
+
+| Package | Price | What you get |
+|---------|-------|--------------|
+| Starter Pilot | $3,500 | Prove value with 1 workflow in 2 weeks |
+| Growth Pilot | $9,000 | Multi-workflow rollout with observability dashboard |
+| Managed Ops | $3k/mo | Ongoing governance + support + quarterly expansion |
+
+[Book a free 15-min MCP security audit →](https://calendly.com/jonathanmelton004/30min)
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d

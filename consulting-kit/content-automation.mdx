@@ -1,0 +1,49 @@
+---
+title: "Content Automation MCP"
+description: "Web scraping, RSS feeds, and link extraction as MCP tools."
+---
+
+**Port:** 8103  
+**Path:** `showcase-servers/content-automation-mcp/`
+
+## What it does
+
+Scrapes web pages, parses RSS feeds, extracts links, and parses HTML tables — all accessible to Claude as MCP tools.
+
+**Example prompts:**
+
+> *"Scrape the pricing page at example.com and summarize the plans."*
+
+> *"Fetch the latest 10 posts from the Hacker News RSS feed."*
+
+> *"Extract all external links from this page."*
+
+## Configuration
+
+No API keys required. Configure optional limits:
+
+```bash
+cp showcase-servers/content-automation-mcp/.env.example \
+   showcase-servers/content-automation-mcp/.env
+```
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `REQUEST_TIMEOUT` | HTTP request timeout in seconds | `30` |
+| `MAX_PAGE_SIZE_KB` | Maximum page size to fetch | `512` |
+| `USER_AGENT` | HTTP User-Agent string | Standard |
+
+## Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `scrape_page` | Fetch and extract text from a URL |
+| `extract_links` | Extract all hyperlinks from a URL |
+| `parse_table` | Extract HTML tables as structured data |
+| `fetch_rss` | Fetch and parse an RSS feed |
+
+## Limitations
+
+- Does not execute JavaScript. Returns static HTML source only.
+- Respects `robots.txt` by default.
+- Public pages only — no login sessions or cookies.

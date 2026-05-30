@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 title: "Health Endpoints"
 description: "Check the status of any FusionAL service"
 ---
@@ -58,10 +59,26 @@ The gateway `/health` endpoint also reports upstream status:
 ```bash
 curl https://gateway.fusional.dev/health
 ```
+=======
+title: "GET /health"
+description: "Verify the gateway is running."
+---
+
+Returns the gateway status. No authentication required.
+
+## Request
+
+```bash
+curl http://localhost:8009/health
+```
+
+## Response
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
 
 ```json
 {
   "status": "ok",
+<<<<<<< HEAD
   "service": "fusional-gateway",
   "uptime": 18340,
   "upstream": {
@@ -77,3 +94,15 @@ curl https://gateway.fusional.dev/health
 ### Polling interval
 
 The Command Center polls all health endpoints every **3 seconds**. For external monitoring, a 30–60 second interval is recommended to avoid unnecessary load.
+=======
+  "version": "1.0.0",
+  "registry_count": 3
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string | Always `"ok"` when the server is running |
+| `version` | string | Gateway version |
+| `registry_count` | integer | Number of registered MCP servers |
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d

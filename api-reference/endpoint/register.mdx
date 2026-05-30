@@ -1,0 +1,52 @@
+---
+title: "POST /register"
+description: "Register an existing MCP server in the gateway catalog."
+---
+
+Adds an MCP server to the gateway registry. Registered servers appear in `/catalog` and become available to connected clients.
+
+## Request body
+
+```json
+{
+  "name": "my-server",
+  "url": "http://localhost:8110/mcp",
+  "port": 8110,
+  "description": "What this server does"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Unique server identifier |
+| `url` | string | Yes | Full MCP endpoint URL |
+| `port` | integer | Yes | Port the server listens on |
+| `description` | string | No | Human-readable description |
+
+## Response
+
+```json
+{
+  "status": "registered",
+  "name": "my-server",
+  "url": "http://localhost:8110/mcp"
+}
+```
+
+## Example
+
+```bash
+curl -X POST http://localhost:8009/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "business-intelligence-mcp",
+    "url": "http://localhost:8101/mcp",
+    "port": 8101,
+    "description": "Natural language to SQL"
+  }'
+```
+
+## Notes
+
+- If a server with the same `name` already exists, this call updates it.
+- The gateway does not verify the server is reachable at registration time.

@@ -1,0 +1,79 @@
+---
+title: "Docker Deploy"
+description: "Run FusionAL in Docker or Docker Compose."
+---
+
+## Single container
+
+Build and run:
+
+```bash
+docker build -t fusional .
+docker run -d -p 8089:8009 --name fusional fusional
+```
+
+Gateway available at `http://localhost:8089`.
+
+## Docker Compose
+
+Start the gateway with Compose:
+
+```bash
+docker compose up -d
+```
+
+Verify:
+
+```bash
+curl http://localhost:8089/health
+```
+
+The `compose.yaml` in the project root defines the gateway service. Edit it to change port mappings, volume mounts, or environment variables.
+
+## Full stack with consulting kit
+
+The MCP consulting kit ships its own Compose file that starts all showcase servers alongside the gateway:
+
+```bash
+cd ../mcp-consulting-kit
+docker compose up -d
+```
+
+This starts:
+
+| Service | Port |
+|---------|------|
+| FusionAL gateway | 8009 |
+| Business Intelligence MCP | 8101 |
+| API Integration Hub | 8102 |
+| Content Automation MCP | 8103 |
+| Intelligence MCP | 8104 |
+
+## Environment variables in Docker
+
+Pass `.env` to the container:
+
+```bash
+docker run -d -p 8089:8009 --env-file .env --name fusional fusional
+```
+
+Or set them in `compose.yaml`:
+
+```yaml
+services:
+  fusional:
+    build: .
+    ports:
+      - "8089:8009"
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SANDBOX_MEMORY_MB=128
+```
+
+## Debug mode
+
+Use `compose.debug.yaml` for a build with live reload and verbose logging:
+
+```bash
+docker compose -f compose.debug.yaml up
+```

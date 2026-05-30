@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 title: "API Reference"
 description: "FusionAL HTTP APIs — health, service control, and LLM completions"
 ---
@@ -14,9 +15,20 @@ FusionAL exposes three categories of HTTP APIs:
 | Christopher-AI completions | `https://christopher.fusional.dev` | Public |
 
 All service health endpoints return JSON. The Management API accepts `POST` requests with no body for start/stop actions. Christopher-AI uses the llama.cpp native HTTP API.
+=======
+title: "REST API"
+description: "FusionAL gateway REST API reference."
+---
+
+The FusionAL gateway exposes a REST API alongside the MCP transport. Use it to execute code, manage the server registry, and trigger server generation programmatically.
+
+**Base URL (local):** `http://localhost:8009`  
+**Base URL (Docker):** `http://localhost:8089`
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
 
 ## Health endpoints
 
+<<<<<<< HEAD
 Every FusionAL service exposes `GET /health`. No authentication required.
 
 ```bash
@@ -56,12 +68,41 @@ curl -X POST https://christopher.fusional.dev/completion \
 ```
 
 See [Completion Endpoint](/api-reference/endpoint/completion) for full reference.
+=======
+When API key auth is enabled, pass your key in every request:
+
+```bash
+curl -H "X-API-Key: your-api-key" http://localhost:8009/catalog
+```
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/health`](/api-reference/endpoint/health) | GET | Health check |
+| [`/execute`](/api-reference/endpoint/execute) | POST | Execute Python in a sandbox |
+| [`/generate`](/api-reference/endpoint/generate) | POST | Generate and launch an MCP server from a prompt |
+| [`/register`](/api-reference/endpoint/register) | POST | Register an MCP server in the registry |
+| [`/catalog`](/api-reference/endpoint/catalog) | GET | List all registered servers |
+
+## Content type
+
+All POST endpoints expect `Content-Type: application/json`.
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
 
 ## Error codes
 
 | Code | Meaning |
+<<<<<<< HEAD
 |---|---|
 | `200` | OK |
 | `502` | Bad gateway — usually a tunnel misconfiguration (http vs https) |
 | `503` | Service unavailable — upstream MCP server is down |
 | `504` | Gateway timeout — upstream didn't respond within the timeout window |
+=======
+|------|---------|
+| 400 | Bad request — malformed JSON or missing required fields |
+| 401 | Unauthorized — missing or invalid API key |
+| 422 | Unprocessable entity — valid JSON but failed validation |
+| 500 | Internal server error — sandbox failure or generation error |
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d

@@ -1,10 +1,15 @@
 ---
 title: "Quickstart"
+<<<<<<< HEAD
 description: "Connect Claude Desktop to FusionAL in under 5 minutes"
+=======
+description: "Start the FusionAL gateway and connect Claude Desktop in five minutes."
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
 ---
 
 ## Prerequisites
 
+<<<<<<< HEAD
 - Claude Desktop installed
 - Access to `claude_desktop_config.json`
 - FusionAL stack running (see [Self-hosting](/development) if you need to set that up first)
@@ -38,11 +43,68 @@ Replace any existing individual MCP server entries with a single FusionAL gatewa
         "@anthropic-ai/mcp-server-fetch",
         "http://gateway.fusional.dev/mcp/"
       ]
+=======
+- Docker Desktop (installed and running)
+- Claude Desktop
+- Python 3.11+
+- Git
+
+## Step 1: Clone and install
+
+```bash
+git clone https://github.com/JRM-FusionAL/FusionAL.git
+cd FusionAL
+
+python -m venv venv
+source venv/bin/activate        # macOS/Linux
+# venv\Scripts\activate         # Windows
+
+pip install -r core/requirements.txt
+```
+
+## Step 2: Start the gateway
+
+```bash
+cd core
+python -m uvicorn main:app --reload --port 8009
+```
+
+Verify it's running:
+
+```bash
+curl http://localhost:8009/health
+```
+
+You should see a `200 OK` response.
+
+## Step 3: Configure Claude Desktop
+
+Find your config file:
+
+| Platform | Path |
+|----------|------|
+| Windows | `C:\Users\YourName\AppData\Roaming\Claude\claude_desktop_config.json` |
+| macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
+| Linux | `~/.config/Claude/claude_desktop_config.json` |
+
+<Warning>
+**Windows users:** Do not use `%APPDATA%` in the path. Claude Desktop does not expand environment variables. Hardcode the full path. Use forward slashes or double backslashes — single backslashes will silently break your config.
+</Warning>
+
+Add FusionAL as an MCP server:
+
+```json
+{
+  "mcpServers": {
+    "fusional-gateway": {
+      "url": "http://localhost:8009/sse"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
     }
   }
 }
 ```
 
+<<<<<<< HEAD
 <Note>
   If you're connecting to a self-hosted instance over Tailscale, replace the domain with the Tailscale IP and port directly: `http://100.65.9.40:8009/mcp/`
 </Note>
@@ -79,3 +141,29 @@ Claude will list the active tools from all upstream MCP servers.
     Run the full stack on your own hardware.
   </Card>
 </Columns>
+=======
+## Step 4: Restart Claude Desktop and test
+
+Fully quit and reopen Claude Desktop. Open a new chat and try:
+
+> *"Generate a Python MCP server that fetches the current weather for a given city."*
+
+FusionAL will generate, register, and run the server automatically.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Add the consulting kit servers" icon="server" href="/consulting-kit/quick-start">
+    Add Business Intelligence, API Integration, Content Automation, and Intelligence servers.
+  </Card>
+  <Card title="Docker deploy" icon="docker" href="/gateway/docker">
+    Run the full gateway in Docker or Docker Compose.
+  </Card>
+  <Card title="Windows troubleshooting" icon="windows" href="/gateway/windows">
+    Six Windows MCP failure modes and their fixes.
+  </Card>
+  <Card title="Build your own server" icon="code" href="/gateway/build-server">
+    Describe a tool in plain English — FusionAL builds and registers it.
+  </Card>
+</CardGroup>
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d

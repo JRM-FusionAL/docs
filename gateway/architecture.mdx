@@ -1,0 +1,66 @@
+---
+title: "Architecture"
+description: "How FusionAL routes requests between AI clients and MCP tool servers."
+---
+
+## System diagram
+
+```
+Claude Desktop / Any MCP Client
+        │
+        ▼  (SSE or Streamable HTTP)
+ FusionAL Gateway  (:8009)
+        │
+  ┌─────┴──────┐
+  ▼            ▼
+FastAPI      MCP Transport (/mcp)
+REST API     ├── execute_code
+             ├── generate_and_execute
+             └── generate_mcp_project
+        │
+        ▼
+ Docker Sandbox Executor
+ (network isolated, memory capped)
+        │
+        ▼
+ MCP Server Registry (JSON)
+ ├── business-intelligence-mcp  (:8101)
+ ├── api-integration-hub        (:8102)
+ └── content-automation-mcp     (:8103)
+```
+
+## Components
+
+**Gateway (`core/`)** — The FastAPI application that handles MCP transport, runs the sandbox executor, and manages the server registry.
+
+**MCP Transport (`/mcp`)** — Implements the MCP Streamable HTTP protocol. Exposes the three built-in tools to any connected client.
+
+**REST API** — Programmatic access to gateway functions: execute code, register servers, list the catalog, generate new servers.
+
+**Docker Sandbox** — Each code execution gets its own isolated container: network isolated, memory capped, read-only filesystem, non-root user.
+
+**Server Registry** — A JSON file (`registry.json`) that tracks all registered MCP servers. The gateway uses this to route tool calls to the right server.
+
+## Transport protocols
+
+| Protocol | Endpoint | Use case |
+|----------|----------|-----------|
+| SSE | `/sse` | Claude Desktop |
+| Streamable HTTP | `/mcp` | Cursor, Windsurf, programmatic clients |
+
+## Request flow
+
+1. Claude Desktop connects to `/sse` at startup.
+2. The gateway returns the tool manifest — only the tools the client is authorized to see.
+3. Claude invokes a tool call.
+4. The gateway routes the call: either to its sandbox executor or to a registered downstream server.
+5. The gateway logs the call (caller, input, latency, status).
+6. The result is returned to Claude.
+
+## Security layers
+
+| Layer | Mechanism |
+|-------|-----------|
+| Client auth | API key validation before any tool call (optional, via `security.py`) |
+| Tool policy | Tool-level allow/deny rules per client identity |
+| Sandbox isolation | Network-isolated, memory-capped Docker container for all code execution |

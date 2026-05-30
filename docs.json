@@ -1,27 +1,36 @@
 {
   "$schema": "https://mintlify.com/docs.json",
+<<<<<<< HEAD
   "theme": "venus",
   "name": "FusionAL",
   "colors": {
     "primary": "#7c3aed",
     "light": "#a855f7",
     "dark": "#5b21b6"
+=======
+  "theme": "mint",
+  "name": "FusionAL Docs",
+  "colors": {
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "FusionAL Gateway",
         "groups": [
           {
             "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "quickstart"
             ]
           },
           {
+<<<<<<< HEAD
             "group": "MCP Services",
             "pages": [
               "services/gateway",
@@ -52,6 +61,93 @@
               "infrastructure/architecture",
               "infrastructure/cloudflare-tunnels",
               "infrastructure/management-api"
+=======
+            "group": "Setup",
+            "pages": [
+              "gateway/installation",
+              "gateway/configuration",
+              "gateway/docker",
+              "gateway/windows"
+            ]
+          },
+          {
+            "group": "Usage",
+            "pages": [
+              "gateway/mcp-tools",
+              "gateway/build-server",
+              "gateway/architecture"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
+            ]
+          }
+        ]
+      },
+      {
+<<<<<<< HEAD
+        "tab": "API Reference",
+=======
+        "tab": "MCP Consulting Kit",
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "consulting-kit/overview",
+              "consulting-kit/quick-start"
+            ]
+          },
+          {
+<<<<<<< HEAD
+            "group": "Management API",
+            "pages": [
+              "api-reference/endpoint/health",
+              "api-reference/endpoint/start-stop",
+              "api-reference/endpoint/completion"
+=======
+            "group": "Servers",
+            "pages": [
+              "consulting-kit/business-intelligence",
+              "consulting-kit/api-integration",
+              "consulting-kit/content-automation",
+              "consulting-kit/intelligence"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "consulting-kit/security",
+              "consulting-kit/deployment"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Christopher AI",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "christopher/overview",
+              "christopher/quick-start"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "christopher/model-profiles",
+              "christopher/workflows"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Connect AI Clients",
+        "groups": [
+          {
+            "group": "Setup Guides",
+            "pages": [
+              "clients/claude-desktop",
+              "clients/cursor",
+              "clients/windsurf"
             ]
           }
         ]
@@ -60,17 +156,15 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "Overview",
+            "group": "REST API",
             "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Management API",
-            "pages": [
+              "api-reference/introduction",
               "api-reference/endpoint/health",
-              "api-reference/endpoint/start-stop",
-              "api-reference/endpoint/completion"
+              "api-reference/endpoint/execute",
+              "api-reference/endpoint/generate",
+              "api-reference/endpoint/register",
+              "api-reference/endpoint/catalog"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
             ]
           }
         ]
@@ -79,6 +173,7 @@
     "global": {
       "anchors": [
         {
+<<<<<<< HEAD
           "anchor": "Command Center",
           "href": "https://fusional-command-center.jonathanmelton-fusional.workers.dev",
           "icon": "gauge"
@@ -87,6 +182,16 @@
           "anchor": "Gateway",
           "href": "https://gateway.fusional.dev",
           "icon": "server"
+=======
+          "anchor": "GitHub",
+          "href": "https://github.com/JRM-FusionAL",
+          "icon": "github"
+        },
+        {
+          "anchor": "Book a Call",
+          "href": "https://calendly.com/jonathanmelton004/30min",
+          "icon": "calendar"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
         }
       ]
     }
@@ -104,6 +209,7 @@
     ],
     "primary": {
       "type": "button",
+<<<<<<< HEAD
       "label": "Command Center",
       "href": "https://fusional-command-center.jonathanmelton-fusional.workers.dev"
     }
@@ -120,6 +226,15 @@
   "footer": {
     "socials": {
       "x": "https://x.com/fusional_dev"
+=======
+      "label": "Book a Call",
+      "href": "https://calendly.com/jonathanmelton004/30min"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/JRM-FusionAL"
+>>>>>>> 6c87d9a087f0b0a7e097211cebad45da532fb50d
     }
   }
 }

@@ -1,0 +1,49 @@
+---
+title: "Christopher AI"
+description: "Fully local voice AI. No cloud. No API keys. No data leaving your machine."
+---
+
+Christopher is a fully offline voice AI pipeline running entirely on your hardware.
+
+```
+Microphone → whisper.cpp → transcript → llama.cpp → reply → Piper TTS → speakers
+```
+
+One bash script. Three compiled-from-source engines. Zero cloud dependencies.
+
+## Stack
+
+| Component | Engine | Model |
+|-----------|--------|-------|
+| Speech Recognition | whisper.cpp | ggml-base.en |
+| Language Model | llama.cpp + CUDA | Llama 3.2 3B / Qwen2.5 3B / Mistral 7B |
+| Text to Speech | Piper | en_US-libritts-high |
+
+**Reference hardware:** i5-7300HQ + GTX 1050 Ti 4GB + WSL2 Ubuntu
+
+## Why local?
+
+- **No API costs** — no subscription fees, no per-token billing
+- **No data exposure** — suitable for sensitive conversations, healthcare, legal, restricted networks
+- **Works offline** — air-gapped environments, hospitals, no internet required
+- **Full control** — choose your model, tune GPU settings, own your pipeline
+
+## Capabilities
+
+- **Voice conversation** — speak and get a spoken response
+- **Text chat mode** — use without a microphone
+- **Workflow templates** — dispatch messages, capture notes, generate summaries
+- **Benchmark mode** — compare model latency on your actual hardware before committing
+
+## Roadmap
+
+- [ ] Wake word detection
+- [ ] MCP tool integration (voice control over FusionAL — database, Slack, GitHub)
+- [ ] RAG module for local document search
+- [ ] WebSocket streaming
+- [ ] GUI dashboard
+- [x] Centralized model profiles + benchmark mode
+
+## Source
+
+[github.com/JRM-FusionAL/Christopher-AI](https://github.com/JRM-FusionAL/Christopher-AI)
